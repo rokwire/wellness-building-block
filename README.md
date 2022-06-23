@@ -108,7 +108,7 @@ Verify the service is running as calling the get version API.
 
 #### Call get version API
 
-curl -X GET -i http://localhost/content/version
+curl -X GET -i http://localhost/wellness/version
 
 Response
 ```

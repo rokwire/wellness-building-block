@@ -16,6 +16,116 @@
     "host": "localhost",
     "basePath": "/wellness",
     "paths": {
+        "/user/todo_categories": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves all user todo categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserTodoCategories",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Creates a user todo category",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "CreateUserTodoCategory",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/user/todo_categories/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves a user todo category by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserTodoCategory",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Updates a user todo category with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "UpdateUserTodoCategory",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes a user todo category with the specified id",
+                "tags": [
+                    "client"
+                ],
+                "operationId": "DeleteUserTodoCategory",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/version": {
             "get": {
                 "description": "Gives the service version.",

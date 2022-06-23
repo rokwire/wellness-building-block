@@ -9,6 +9,73 @@ info:
   title: Rokwire Wellness Building Block API
   version: 1.2.0
 paths:
+  /user/todo_categories:
+    get:
+      consumes:
+      - application/json
+      deprecated: true
+      description: Retrieves all user todo categories
+      operationId: GetUserTodoCategories
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    post:
+      consumes:
+      - application/json
+      deprecated: true
+      description: Creates a user todo category
+      operationId: CreateUserTodoCategory
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /user/todo_categories/{id}:
+    delete:
+      deprecated: true
+      description: Deletes a user todo category with the specified id
+      operationId: DeleteUserTodoCategory
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - client
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user todo category by id
+      operationId: GetUserTodoCategory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    put:
+      consumes:
+      - application/json
+      description: Updates a user todo category with the specified id
+      operationId: UpdateUserTodoCategory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /version:
     get:
       description: Gives the service version.

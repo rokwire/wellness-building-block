@@ -68,7 +68,7 @@ func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
 	}
 
 	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core"}, logs.NewLogger("wellness", &logs.LoggerOpts{}))
-	authService, err := authservice.NewAuthService("wellness", config.ContentServiceURL, serviceLoader)
+	authService, err := authservice.NewAuthService("wellness", config.ServiceURL, serviceLoader)
 	if err != nil {
 		log.Fatalf("Error initializing auth service: %v", err)
 	}

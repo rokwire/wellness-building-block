@@ -74,13 +74,17 @@ func (we Adapter) Start() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// handle apis
-	contentRouter := router.PathPrefix("/wellness").Subrouter()
-	contentRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
-	contentRouter.HandleFunc("/doc", we.serveDoc)
-	contentRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+	subRouter := router.PathPrefix("/wellness").Subrouter()
+	subRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
+	subRouter.HandleFunc("/doc", we.serveDoc)
+	subRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
-	// handle student guide admin apis
-	//adminSubRouter := contentRouter.PathPrefix("/admin").Subrouter()
+	// handle user todo categories apis
+	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.permissionsAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.CreateUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("PUT")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -91,7 +95,7 @@ func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (we Adapter) serveDocUI() http.Handler {
-	url := fmt.Sprintf("%s/content/doc", we.host)
+	url := fmt.Sprintf("%s/wellness/doc", we.host)
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 

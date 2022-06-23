@@ -19,6 +19,8 @@ package storage
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"time"
 
@@ -33,6 +35,9 @@ type database struct {
 
 	db       *mongo.Database
 	dbClient *mongo.Client
+
+	todoCategories *collectionWrapper
+	todoEntries    *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -58,6 +63,21 @@ func (m *database) start() error {
 
 	//apply checks
 	db := client.Database(m.mongoDBName)
+
+	todoCategories := &collectionWrapper{database: m, coll: db.Collection("todo_categories")}
+	err = m.applyTodoCategoriesChecks(todoCategories)
+	if err != nil {
+		return err
+	}
+
+	todoEntries := &collectionWrapper{database: m, coll: db.Collection("todo_entries")}
+	err = m.applyTodoEntriesChecks(todoEntries)
+	if err != nil {
+		return err
+	}
+
+	m.todoCategories = todoCategories
+	m.todoEntries = todoEntries
 
 	//asign the db, db client and the collections
 	m.db = db
@@ -85,4 +105,60 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 	} else {
 		log.Println("other collection changed")
 	}
+}
+
+func (m *database) applyTodoCategoriesChecks(categories *collectionWrapper) error {
+	log.Println("apply todo_categories checks.....")
+
+	//Add org_id + app_id index
+	err := categories.AddIndex(
+		bson.D{primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add user_id index
+	err = categories.AddIndex(
+		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	log.Println("todo_categories passed")
+	return nil
+}
+
+func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
+	log.Println("apply todo_entries checks.....")
+
+	//Add org_id + app_id index
+	err := entries.AddIndex(
+		bson.D{primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add user_id index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add user_id index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	log.Println("todo_entries passed")
+	return nil
 }

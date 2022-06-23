@@ -65,11 +65,11 @@ func main() {
 	// web adapter
 	host := getEnvKey("WELLNESS_HOST", true)
 	coreBBHost := getEnvKey("WELLNESS_CORE_BB_HOST", true)
-	contentServiceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
+	serviceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
 
 	config := model.Config{
-		CoreBBHost:        coreBBHost,
-		ContentServiceURL: contentServiceURL,
+		CoreBBHost: coreBBHost,
+		ServiceURL: serviceURL,
 	}
 
 	webAdapter := driver.NewWebAdapter(host, port, application, config)
