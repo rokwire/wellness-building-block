@@ -20,7 +20,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user/todo_categories": {
+        "/api/user/todo_categories": {
             "get": {
                 "security": [
                     {
@@ -35,7 +35,6 @@ const docTemplate = `{
                     "Client"
                 ],
                 "operationId": "GetUserTodoCategories",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -56,7 +55,6 @@ const docTemplate = `{
                     "Client"
                 ],
                 "operationId": "CreateUserTodoCategory",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -64,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/todo_categories/{id}": {
+        "/api/user/todo_categories/{id}": {
             "get": {
                 "security": [
                     {
@@ -119,10 +117,9 @@ const docTemplate = `{
                 ],
                 "description": "Deletes a user todo category with the specified id",
                 "tags": [
-                    "client"
+                    "Client"
                 ],
                 "operationId": "DeleteUserTodoCategory",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -158,11 +155,6 @@ const docTemplate = `{
             "type": "apiKey",
             "name": "Authorization",
             "in": "header (add Bearer prefix to the Authorization value)"
-        },
-        "RokwireAuth": {
-            "type": "apiKey",
-            "name": "ROKWIRE-API-KEY",
-            "in": "header"
         },
         "UserAuth": {
             "type": "apiKey",

@@ -54,8 +54,7 @@ func (h ApisHandler) Version(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Success 200
 // @Security UserAuth
-// @Deprecated true
-// @Router  /user/todo_categories [get]
+// @Router  /api/user/todo_categories [get]
 func (h ApisHandler) GetUserTodoCategories(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	resData, err := h.app.Services.GetTodoCategories(claims.AppID, claims.OrgID, claims.Subject)
@@ -89,7 +88,7 @@ func (h ApisHandler) GetUserTodoCategories(claims *tokenauth.Claims, w http.Resp
 // @Produce json
 // @Success 200
 // @Security UserAuth
-// @Router  /user/todo_categories/{id} [get]
+// @Router  /api/user/todo_categories/{id} [get]
 func (h ApisHandler) GetUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -121,7 +120,7 @@ func (h ApisHandler) GetUserTodoCategory(claims *tokenauth.Claims, w http.Respon
 // @Produce json
 // @Success 200
 // @Security UserAuth
-// @Router /user/todo_categories/{id} [put]
+// @Router /api/user/todo_categories/{id} [put]
 func (h ApisHandler) UpdateUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -167,8 +166,7 @@ func (h ApisHandler) UpdateUserTodoCategory(claims *tokenauth.Claims, w http.Res
 // @Accept json
 // @Success 200
 // @Security UserAuth
-// @Deprecated true
-// @Router /user/todo_categories [post]
+// @Router /api/user/todo_categories [post]
 func (h ApisHandler) CreateUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -207,12 +205,11 @@ func (h ApisHandler) CreateUserTodoCategory(claims *tokenauth.Claims, w http.Res
 
 // DeleteUserTodoCategory Deletes a user todo category with the specified id
 // @Description Deletes a user todo category with the specified id
-// @Tags client
+// @Tags Client
 // @ID DeleteUserTodoCategory
 // @Success 200
 // @Security UserAuth
-// @Deprecated true
-// @Router /user/todo_categories/{id} [delete]
+// @Router /api/user/todo_categories/{id} [delete]
 func (h ApisHandler) DeleteUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]

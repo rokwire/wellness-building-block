@@ -52,10 +52,6 @@ type Adapter struct {
 // @BasePath /wellness
 // @schemes https
 
-// @securityDefinitions.apikey RokwireAuth
-// @in header
-// @name ROKWIRE-API-KEY
-
 // @securityDefinitions.apikey UserAuth
 // @in header (add Bearer prefix to the Authorization value)
 // @name Authorization
@@ -78,6 +74,8 @@ func (we Adapter) Start() {
 	subRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
 	subRouter.HandleFunc("/doc", we.serveDoc)
 	subRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+
+	subRouter = subRouter.PathPrefix("/api").Subrouter()
 
 	// handle user todo categories apis
 	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.permissionsAuth)).Methods("GET")

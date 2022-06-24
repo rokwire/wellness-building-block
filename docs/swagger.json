@@ -16,7 +16,7 @@
     "host": "localhost",
     "basePath": "/wellness",
     "paths": {
-        "/user/todo_categories": {
+        "/api/user/todo_categories": {
             "get": {
                 "security": [
                     {
@@ -31,7 +31,6 @@
                     "Client"
                 ],
                 "operationId": "GetUserTodoCategories",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -52,7 +51,6 @@
                     "Client"
                 ],
                 "operationId": "CreateUserTodoCategory",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -60,7 +58,7 @@
                 }
             }
         },
-        "/user/todo_categories/{id}": {
+        "/api/user/todo_categories/{id}": {
             "get": {
                 "security": [
                     {
@@ -115,10 +113,9 @@
                 ],
                 "description": "Deletes a user todo category with the specified id",
                 "tags": [
-                    "client"
+                    "Client"
                 ],
                 "operationId": "DeleteUserTodoCategory",
-                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": ""
@@ -154,11 +151,6 @@
             "type": "apiKey",
             "name": "Authorization",
             "in": "header (add Bearer prefix to the Authorization value)"
-        },
-        "RokwireAuth": {
-            "type": "apiKey",
-            "name": "ROKWIRE-API-KEY",
-            "in": "header"
         },
         "UserAuth": {
             "type": "apiKey",
