@@ -78,11 +78,11 @@ func (we Adapter) Start() {
 	subRouter = subRouter.PathPrefix("/api").Subrouter()
 
 	// handle user todo categories apis
-	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.permissionsAuth)).Methods("GET")
-	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.CreateUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("POST")
-	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("GET")
-	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("PUT")
-	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoCategory, we.auth.coreAuth.permissionsAuth)).Methods("DELETE")
+	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.CreateUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("PUT")
+	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
