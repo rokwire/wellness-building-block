@@ -140,7 +140,7 @@ func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string,
 			primitive.E{Key: "date_updated", Value: time.Now()},
 		}},
 	}
-	res, err := sa.db.todoCategories.UpdateOne(filter, update, nil)
+	_, err := sa.db.todoCategories.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("error updating user defined todo category: %s", err)
 		return nil, err
