@@ -127,9 +127,8 @@ func (sa *Adapter) CreateTodoCategory(appID string, orgID string, userID string,
 // UpdateTodoCategory updates a user defined todo category
 func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error) {
 
-	now := time.Now()
-	category.DateUpdated = &now
-	filter := bson.D{primitive.E{Key: "app_id", Value: appID},
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 		primitive.E{Key: "_id", Value: category.ID}}
@@ -138,10 +137,10 @@ func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string,
 			primitive.E{Key: "name", Value: category.Name},
 			primitive.E{Key: "color", Value: category.Color},
 			primitive.E{Key: "reminder_type", Value: category.ReminderType},
-			primitive.E{Key: "date_updated", Value: category.DateUpdated},
+			primitive.E{Key: "date_updated", Value: time.Now()},
 		}},
 	}
-	_, err := sa.db.todoCategories.UpdateOne(filter, update, nil)
+	res, err := sa.db.todoCategories.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("error updating user defined todo category: %s", err)
 		return nil, err
@@ -222,13 +221,14 @@ func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, ca
 // UpdateTodoEntry updates a todo entry
 func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
 
-	filter := bson.D{primitive.E{Key: "app_id", Value: appID},
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 		primitive.E{Key: "_id", Value: todo.ID}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "name", Value: todo.Title},
+			primitive.E{Key: "title", Value: todo.Title},
 			primitive.E{Key: "description", Value: todo.Description},
 			primitive.E{Key: "category", Value: todo.Category},
 			primitive.E{Key: "completed", Value: todo.Completed},
@@ -250,7 +250,8 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 
 // DeleteTodoEntry deletes a todo entry
 func (sa *Adapter) DeleteTodoEntry(appID string, orgID string, userID string, id string) error {
-	filter := bson.D{primitive.E{Key: "app_id", Value: appID},
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 		primitive.E{Key: "_id", Value: id}}

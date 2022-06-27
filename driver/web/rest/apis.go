@@ -140,7 +140,13 @@ func (h ApisHandler) UpdateUserTodoCategory(claims *tokenauth.Claims, w http.Res
 		return
 	}
 
-	resData, err := h.app.Services.UpdateTodoCategory(claims.AppID, claims.OrgID, id, &item)
+	if id != item.ID {
+		log.Printf("Inconsistent attempt to update query param  and json id are not equal")
+		http.Error(w, "Inconsistent attempt to update query param  and json id are not equal", http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.UpdateTodoCategory(claims.AppID, claims.OrgID, claims.Subject, &item)
 	if err != nil {
 		log.Printf("Error on updating user todo category with id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -217,6 +223,196 @@ func (h ApisHandler) DeleteUserTodoCategory(claims *tokenauth.Claims, w http.Res
 	err := h.app.Services.DeleteTodoCategory(claims.AppID, claims.OrgID, claims.Subject, id)
 	if err != nil {
 		log.Printf("Error on deleting user todo category with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// GetUserTodoEntries Retrieves all user todo entries
+// @Description Retrieves all user todo entries
+// @Tags Client
+// @ID GetUserTodoEntries
+// @Accept json
+// @Success 200
+// @Security UserAuth
+// @Router  /api/user/todo_entries [get]
+func (h ApisHandler) GetUserTodoEntries(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	resData, err := h.app.Services.GetTodoEntries(claims.AppID, claims.OrgID, claims.Subject)
+	if err != nil {
+		log.Printf("Error on getting user todo entries - %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		resData = []model.TodoEntry{}
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal all user todo entries: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// GetUserTodoEntry Retrieves a user todo entry by id
+// @Description Retrieves a user todo entry by id
+// @Tags Client
+// @ID GetUserTodoEntry
+// @Accept json
+// @Produce json
+// @Success 200
+// @Security UserAuth
+// @Router  /api/user/todo_entries/{id} [get]
+func (h ApisHandler) GetUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resData, err := h.app.Services.GetTodoEntry(claims.AppID, claims.OrgID, claims.Subject, id)
+	if err != nil {
+		log.Printf("Error on getting user todo entry by id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		log.Printf("Error on getting user todo entry by id - %s (Not found)", id)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal user todo entry: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// UpdateUserTodoEntry Updates a user todo entry with the specified id
+// @Description Updates a user todo entry with the specified id
+// @Tags Client
+// @ID UpdateUserTodoEntry
+// @Accept json
+// @Produce json
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/todo_entries/{id} [put]
+func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal create a user todo entry - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.TodoEntry
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on unmarshal the create user todo entry request data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if id != item.ID {
+		log.Printf("Inconsistent attempt to update todo entry - query param  and json id are not equal")
+		http.Error(w, "Inconsistent attempt to update todo entry - query param  and json id are not equal", http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.UpdateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
+	if err != nil {
+		log.Printf("Error on updating user todo entry with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal the updated user todo entry: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// CreateUserTodoEntry Creates a user todo entry
+// @Description Creates a user todo entry
+// @Tags Client
+// @ID CreateUserTodoEntry
+// @Accept json
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/todo_entries [post]
+func (h ApisHandler) CreateUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal create a user todo entry - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item model.TodoEntry
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on unmarshal the create user todo entry request data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	createdItem, err := h.app.Services.CreateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
+	if err != nil {
+		log.Printf("Error on creating user todo entry: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(createdItem)
+	if err != nil {
+		log.Printf("Error on marshal the new user todo entry: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// DeleteUserTodoEntry Deletes a user todo entry with the specified id
+// @Description Deletes a user todo entry with the specified id
+// @Tags Client
+// @ID DeleteUserTodoEntry
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/todo_entries/{id} [delete]
+func (h ApisHandler) DeleteUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := h.app.Services.DeleteTodoEntry(claims.AppID, claims.OrgID, claims.Subject, id)
+	if err != nil {
+		log.Printf("Error on deleting user todo entry with id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

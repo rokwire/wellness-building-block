@@ -73,6 +73,70 @@ paths:
       - UserAuth: []
       tags:
       - Client
+  /api/user/todo_entries:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all user todo entries
+      operationId: GetUserTodoEntries
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    post:
+      consumes:
+      - application/json
+      description: Creates a user todo entry
+      operationId: CreateUserTodoEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /api/user/todo_entries/{id}:
+    delete:
+      description: Deletes a user todo entry with the specified id
+      operationId: DeleteUserTodoEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user todo entry by id
+      operationId: GetUserTodoEntry
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    put:
+      consumes:
+      - application/json
+      description: Updates a user todo entry with the specified id
+      operationId: UpdateUserTodoEntry
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /version:
     get:
       description: Gives the service version.

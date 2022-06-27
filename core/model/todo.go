@@ -33,7 +33,7 @@ type TodoEntry struct {
 	Location *struct {
 		Latitude  float64 `json:"latitude" bson:"latitude"`
 		Longitude float64 `json:"longitude" bson:"longitude"`
-	} `json:"location"`
+	} `json:"location" bson:"location"`
 	Completed        bool       `json:"completed" bson:"completed"`
 	HasDueTime       bool       `json:"has_due_time" bson:"has_due_time"`
 	DueDateTime      string     `json:"due_date_time" bson:"due_date_time"`

@@ -84,6 +84,12 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("PUT")
 	subRouter.HandleFunc("/user/todo_categories/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
+	// handle user todo entries apis
+	subRouter.HandleFunc("/user/todo_entries", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoEntries, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_entries", we.coreAuthWrapFunc(we.apisHandler.CreateUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/todo_entries/{id}", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/todo_entries/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("PUT")
+	subRouter.HandleFunc("/user/todo_entries/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 
