@@ -15,6 +15,7 @@ type TodoCategory struct {
 	DateUpdated  *time.Time `json:"date_updated" bson:"date_updated"`
 } // @name TodoCategory
 
+// ToCategoryRef Converts to CategoryRef
 func (c *TodoCategory) ToCategoryRef() CategoryRef {
 	return CategoryRef{
 		ID: c.ID, OrgID: c.OrgID, AppID: c.AppID, UserID: c.UserID,
