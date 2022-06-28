@@ -36,6 +36,7 @@ type Services interface {
 	CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
+	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
 }
 
 type servicesImpl struct {
@@ -86,6 +87,10 @@ func (s *servicesImpl) DeleteTodoEntry(appID string, orgID string, userID string
 	return s.app.deleteTodoEntry(appID, orgID, userID, id)
 }
 
+func (s *servicesImpl) DeleteCompletedTodoEntries(appID string, orgID string, userID string) error {
+	return s.app.deleteCompletedTodoEntries(appID, orgID, userID)
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	GetTodoCategories(appID string, orgID string, userID string) ([]model.TodoCategory, error)
@@ -99,4 +104,5 @@ type Storage interface {
 	CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
+	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
 }

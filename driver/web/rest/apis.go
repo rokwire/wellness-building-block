@@ -421,6 +421,28 @@ func (h ApisHandler) DeleteUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteCompletedUserTodoEntry Deletes all completed user todo entries
+// @Description Deletes all completed user todo entries
+// @Tags Client
+// @ID DeleteCompletedUserTodoEntry
+// @Success 200
+// @Security UserAuth
+// @Router /user/todo_entries/clear_completed_entries [delete]
+func (h ApisHandler) DeleteCompletedUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := h.app.Services.DeleteCompletedTodoEntries(claims.AppID, claims.OrgID, claims.Subject)
+	if err != nil {
+		log.Printf("Error on deleting user todo entry with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
 func intPostValueFromString(stringValue string) int {
 	var value int
 	if len(stringValue) > 0 {

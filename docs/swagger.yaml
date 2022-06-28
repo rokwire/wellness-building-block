@@ -137,6 +137,17 @@ paths:
       - UserAuth: []
       tags:
       - Client
+  /user/todo_entries/clear_completed_entries:
+    delete:
+      description: Deletes all completed user todo entries
+      operationId: DeleteCompletedUserTodoEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /version:
     get:
       description: Gives the service version.

@@ -323,7 +323,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 	}
 	_, err := sa.db.todoEntries.UpdateOne(filter, update, nil)
 	if err != nil {
-		log.Printf("error updating user defined todo category: %s", err)
+		log.Printf("error updating user defined todo entry: %s", err)
 		return nil, err
 	}
 
@@ -340,7 +340,24 @@ func (sa *Adapter) DeleteTodoEntry(appID string, orgID string, userID string, id
 
 	_, err := sa.db.todoEntries.DeleteOne(filter, nil)
 	if err != nil {
-		log.Printf("error deleting todo category: %s", err)
+		log.Printf("error deleting todo entry: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+// DeleteCompletedTodoEntries deletes a completed todo entries
+func (sa *Adapter) DeleteCompletedTodoEntries(appID string, orgID string, userID string) error {
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "completed", Value: true}}
+
+	_, err := sa.db.todoEntries.DeleteMany(filter, nil)
+	if err != nil {
+		log.Printf("error deleting comleted todo entries: %s", err)
 		return err
 	}
 

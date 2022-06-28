@@ -62,3 +62,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {
 	return app.storage.DeleteTodoEntry(appID, orgID, userID, id)
 }
+
+func (app *Application) deleteCompletedTodoEntries(appID string, orgID string, userID string) error {
+	return app.storage.DeleteCompletedTodoEntries(appID, orgID, userID)
+}

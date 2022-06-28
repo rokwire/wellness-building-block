@@ -234,6 +234,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/todo_entries/clear_completed_entries": {
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes all completed user todo entries",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "DeleteCompletedUserTodoEntry",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/version": {
             "get": {
                 "description": "Gives the service version.",
