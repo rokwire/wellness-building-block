@@ -19,6 +19,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -127,23 +128,63 @@ func (sa *Adapter) CreateTodoCategory(appID string, orgID string, userID string,
 // UpdateTodoCategory updates a user defined todo category
 func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error) {
 
-	filter := bson.D{
-		primitive.E{Key: "app_id", Value: appID},
-		primitive.E{Key: "org_id", Value: orgID},
-		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "_id", Value: category.ID}}
-	update := bson.D{
-		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "name", Value: category.Name},
-			primitive.E{Key: "color", Value: category.Color},
-			primitive.E{Key: "reminder_type", Value: category.ReminderType},
-			primitive.E{Key: "date_updated", Value: time.Now()},
-		}},
-	}
-	_, err := sa.db.todoCategories.UpdateOne(filter, update, nil)
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			log.Printf("error starting a transaction - %s", err)
+			return err
+		}
+
+		filter := bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "_id", Value: category.ID}}
+		update := bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "name", Value: category.Name},
+				primitive.E{Key: "color", Value: category.Color},
+				primitive.E{Key: "reminder_type", Value: category.ReminderType},
+				primitive.E{Key: "date_updated", Value: time.Now()},
+			}},
+		}
+		_, err = sa.db.todoCategories.UpdateOneWithContext(sessionContext, filter, update, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error updating user defined todo category: %s", err)
+			return err
+		}
+
+		filter = bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "category.id", Value: category.ID}}
+		update = bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "category", Value: category.ToCategoryRef()},
+			}},
+		}
+		_, err = sa.db.todoEntries.UpdateManyWithContext(sessionContext, filter, update, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error updating user defined todo category: %s", err)
+			return err
+		}
+
+		//commit the transaction
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		log.Printf("error updating user defined todo category: %s", err)
-		return nil, err
+		log.Printf("error on update category: %s", err)
+		return nil, fmt.Errorf("error on update category: %s", err)
 	}
 
 	return sa.GetTodoCategory(appID, orgID, userID, category.ID)
@@ -151,15 +192,56 @@ func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string,
 
 // DeleteTodoCategory deletes a user defined todo category
 func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string, id string) error {
-	filter := bson.D{primitive.E{Key: "app_id", Value: appID},
-		primitive.E{Key: "org_id", Value: orgID},
-		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "_id", Value: id}}
 
-	_, err := sa.db.todoCategories.DeleteOne(filter, nil)
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			log.Printf("error starting a transaction - %s", err)
+			return err
+		}
+
+		filter := bson.D{primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "_id", Value: id}}
+
+		_, err = sa.db.todoCategories.DeleteOneWithContext(sessionContext, filter, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error deleting todo category: %s", err)
+			return err
+		}
+
+		filter = bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "category.id", Value: id}}
+		update := bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "category", Value: bson.TypeNull},
+			}},
+		}
+		_, err = sa.db.todoEntries.UpdateManyWithContext(sessionContext, filter, update, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error deleting todo category: %s", err)
+			return err
+		}
+
+		//commit the transaction
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		log.Printf("error deleting todo category: %s", err)
-		return err
+		log.Printf("error on delete todo category: %s", err)
+		return fmt.Errorf("error on delete todo category: %s", err)
 	}
 
 	return nil
