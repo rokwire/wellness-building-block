@@ -19,6 +19,7 @@ package web
 
 import (
 	"fmt"
+	"github.com/rokwire/core-auth-library-go/authservice"
 	"log"
 	"net/http"
 	"wellness/core"
@@ -37,8 +38,9 @@ type Adapter struct {
 	port string
 	auth *Auth
 
-	apisHandler      rest.ApisHandler
-	adminApisHandler rest.AdminApisHandler
+	apisHandler         rest.ApisHandler
+	adminApisHandler    rest.AdminApisHandler
+	internalApisHandler rest.InternalApisHandler
 
 	app *core.Application
 }
@@ -60,6 +62,10 @@ type Adapter struct {
 // @in header (add Bearer prefix to the Authorization value)
 // @name Authorization
 
+// @securityDefinitions.apikey InternalAPIAuth
+// @in header (add INTERNAL-API-KEY header with an appropriate value)
+// @name Authorization
+
 // @securityDefinitions.apikey AdminGroupAuth
 // @in header
 // @name GROUP
@@ -76,6 +82,8 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
 	subRouter = subRouter.PathPrefix("/api").Subrouter()
+
+	subRouter.HandleFunc("/int/process_reminders", we.internalAuthWrapFunc(we.internalApisHandler.ProcessReminders)).Methods("POST")
 
 	// handle user todo categories apis
 	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.standardAuth)).Methods("GET")
@@ -129,13 +137,32 @@ func (we Adapter) coreAuthWrapFunc(handler coreAuthFunc, authorization Authoriza
 	}
 }
 
+type internalAuthFunc = func(http.ResponseWriter, *http.Request)
+
+func (we Adapter) internalAuthWrapFunc(handler internalAuthFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		utils.LogRequest(req)
+
+		status, err := we.auth.internalAuth.check(req)
+		if err != nil {
+			log.Printf("error authorization check - %s", err)
+			http.Error(w, http.StatusText(status), status)
+			return
+		}
+
+		handler(w, req)
+	}
+}
+
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, config model.Config) Adapter {
-	auth := NewAuth(app, config)
+func NewWebAdapter(host string, port string, app *core.Application, config model.Config, authService *authservice.AuthService) Adapter {
+	auth := NewAuth(app, config, authService)
 
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
-	return Adapter{host: host, port: port, auth: auth, apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app}
+	internalApisHandler := rest.NewInternalApisHandler(app)
+	return Adapter{host: host, port: port, auth: auth, apisHandler: apisHandler, adminApisHandler: adminApisHandler,
+		internalApisHandler: internalApisHandler, app: app}
 }
 
 // AppListener implements core.ApplicationListener interface

@@ -17,7 +17,12 @@
 
 package core
 
-import "wellness/core/model"
+import (
+	"fmt"
+	"log"
+	"time"
+	"wellness/core/model"
+)
 
 func (app *Application) getVersion() string {
 	return app.version
@@ -65,4 +70,50 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 
 func (app *Application) deleteCompletedTodoEntries(appID string, orgID string, userID string) error {
 	return app.storage.DeleteCompletedTodoEntries(appID, orgID, userID)
+}
+
+func (app *Application) processReminders() error {
+	now := time.Now()
+	todos, err := app.storage.GetTodoEntriesWithCurrentDueTime(now)
+	if err != nil {
+		log.Printf("Error on retrieving reminders: %s", err)
+	}
+
+	topic := "wellness.reminders"
+	if len(todos) > 0 {
+		for _, todo := range todos {
+			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todo.ID,
+				"entity_name": todo.Title,
+			})
+			if err != nil {
+				log.Printf("Error on sending reminder inbox message: %s", err)
+			}
+		}
+	}
+
+	todos, err = app.storage.GetTodoEntriesWithCurrentDueTime(now)
+	if err != nil {
+		log.Printf("Error on retrieving due time reminders: %s", err)
+	}
+
+	if len(todos) > 0 {
+		for _, todo := range todos {
+			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todo.ID,
+				"entity_name": todo.Title,
+			})
+			if err != nil {
+				log.Printf("Error on sending reminder inbox message: %s", err)
+			}
+		}
+	}
+
+	return nil
 }

@@ -234,6 +234,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/int/process_reminders": {
+            "post": {
+                "security": [
+                    {
+                        "InternalAPIAuth": []
+                    }
+                ],
+                "description": "Process reminders. Invoked by AWS Scheduler API",
+                "tags": [
+                    "Internal"
+                ],
+                "operationId": "ProcessReminders",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/user/todo_entries/clear_completed_entries": {
             "delete": {
                 "security": [
@@ -281,6 +300,11 @@ const docTemplate = `{
             "type": "apiKey",
             "name": "Authorization",
             "in": "header (add Bearer prefix to the Authorization value)"
+        },
+        "InternalAPIAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header (add INTERNAL-API-KEY header with an appropriate value)"
         },
         "UserAuth": {
             "type": "apiKey",

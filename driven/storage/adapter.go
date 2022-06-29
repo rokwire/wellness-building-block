@@ -364,6 +364,47 @@ func (sa *Adapter) DeleteCompletedTodoEntries(appID string, orgID string, userID
 	return nil
 }
 
+// GetTodoEntriesWithCurrentReminderTime Gets all todo entries that are applied for the specified reminder datetime
+func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time) ([]model.TodoEntry, error) {
+	startDate := time.Date(reminderTime.Year(), reminderTime.Month(), reminderTime.Day(), reminderTime.Hour(), reminderTime.Minute(), 0, 0, reminderTime.Location())
+	endDate := time.Date(reminderTime.Year(), reminderTime.Month(), reminderTime.Day(), reminderTime.Hour(), reminderTime.Minute(), 59, 999999, reminderTime.Location())
+	filter := bson.D{
+		primitive.E{Key: "completed", Value: false},
+		primitive.E{Key: "reminder_date_time", Value: []primitive.E{
+			{Key: "$gte", Value: startDate},
+			{Key: "$lte", Value: endDate},
+		}},
+	}
+
+	var result []model.TodoEntry
+	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// GetTodoEntriesWithCurrentDueTime Gets all todo entries that are applied for the specified due datetime
+func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.TodoEntry, error) {
+	startDate := time.Date(dueTime.Year(), dueTime.Month(), dueTime.Day(), dueTime.Hour(), dueTime.Minute(), 0, 0, dueTime.Location())
+	endDate := time.Date(dueTime.Year(), dueTime.Month(), dueTime.Day(), dueTime.Hour(), dueTime.Minute(), 59, 999999, dueTime.Location())
+	filter := bson.D{
+		primitive.E{Key: "completed", Value: false},
+		primitive.E{Key: "has_due_time", Value: true},
+		primitive.E{Key: "reminder_date_time", Value: []primitive.E{
+			{Key: "$gte", Value: startDate},
+			{Key: "$lte", Value: endDate},
+		}},
+	}
+
+	var result []model.TodoEntry
+	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
 	err := sessionContext.AbortTransaction(sessionContext)
 	if err != nil {

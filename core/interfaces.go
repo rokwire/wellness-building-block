@@ -18,6 +18,7 @@
 package core
 
 import (
+	"time"
 	"wellness/core/model"
 )
 
@@ -37,6 +38,8 @@ type Services interface {
 	UpdateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
+
+	ProcessReminders() error
 }
 
 type servicesImpl struct {
@@ -91,6 +94,10 @@ func (s *servicesImpl) DeleteCompletedTodoEntries(appID string, orgID string, us
 	return s.app.deleteCompletedTodoEntries(appID, orgID, userID)
 }
 
+func (s *servicesImpl) ProcessReminders() error {
+	return s.app.processReminders()
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	GetTodoCategories(appID string, orgID string, userID string) ([]model.TodoCategory, error)
@@ -99,10 +106,17 @@ type Storage interface {
 	UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	DeleteTodoCategory(appID string, orgID string, userID string, id string) error
 
+	GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time) ([]model.TodoEntry, error)
+	GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
+}
+
+// Notifications wrapper
+type Notifications interface {
+	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, data map[string]string) error
 }

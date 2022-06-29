@@ -463,3 +463,8 @@ func NewApisHandler(app *core.Application) ApisHandler {
 func NewAdminApisHandler(app *core.Application) AdminApisHandler {
 	return AdminApisHandler{app: app}
 }
+
+// NewInternalApisHandler creates new rest Handler instance
+func NewInternalApisHandler(app *core.Application) InternalApisHandler {
+	return InternalApisHandler{app: app}
+}

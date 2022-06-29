@@ -137,6 +137,17 @@ paths:
       - UserAuth: []
       tags:
       - Client
+  /int/process_reminders:
+    post:
+      description: Process reminders. Invoked by AWS Scheduler API
+      operationId: ProcessReminders
+      responses:
+        "200":
+          description: ""
+      security:
+      - InternalAPIAuth: []
+      tags:
+      - Internal
   /user/todo_entries/clear_completed_entries:
     delete:
       description: Deletes all completed user todo entries
@@ -168,6 +179,10 @@ securityDefinitions:
     type: apiKey
   AdminUserAuth:
     in: header (add Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+  InternalAPIAuth:
+    in: header (add INTERNAL-API-KEY header with an appropriate value)
     name: Authorization
     type: apiKey
   UserAuth:
