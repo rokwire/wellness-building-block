@@ -73,6 +73,8 @@ func (app *Application) deleteCompletedTodoEntries(appID string, orgID string, u
 }
 
 func (app *Application) processReminders() error {
+
+	log.Printf("Start reminder processing")
 	now := time.Now()
 	todos, err := app.storage.GetTodoEntriesWithCurrentDueTime(now)
 	if err != nil {
@@ -94,6 +96,7 @@ func (app *Application) processReminders() error {
 			}
 		}
 	}
+	log.Printf("Processed %d reminders", len(todos))
 
 	todos, err = app.storage.GetTodoEntriesWithCurrentReminderTime(now)
 	if err != nil {
@@ -114,6 +117,9 @@ func (app *Application) processReminders() error {
 			}
 		}
 	}
+	log.Printf("Processed %d due date reminders", len(todos))
+
+	log.Printf("End reminder processing")
 
 	return nil
 }
