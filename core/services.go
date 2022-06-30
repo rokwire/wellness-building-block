@@ -82,7 +82,7 @@ func (app *Application) processReminders() error {
 	topic := "wellness.reminders"
 	if len(todos) > 0 {
 		for _, todo := range todos {
-			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, map[string]string{
+			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO Reminder: %s", todo.Title), todo.Description, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
@@ -95,7 +95,7 @@ func (app *Application) processReminders() error {
 		}
 	}
 
-	todos, err = app.storage.GetTodoEntriesWithCurrentDueTime(now)
+	todos, err = app.storage.GetTodoEntriesWithCurrentReminderTime(now)
 	if err != nil {
 		log.Printf("Error on retrieving due time reminders: %s", err)
 	}

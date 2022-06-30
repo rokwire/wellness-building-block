@@ -116,7 +116,7 @@ func (sa *Adapter) CreateTodoCategory(appID string, orgID string, userID string,
 	category.OrgID = orgID
 	category.AppID = appID
 	category.UserID = userID
-	category.DateCreated = time.Now()
+	category.DateCreated = time.Now().UTC()
 
 	_, err := sa.db.todoCategories.InsertOne(&category)
 	if err != nil {
@@ -145,7 +145,7 @@ func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string,
 				primitive.E{Key: "name", Value: category.Name},
 				primitive.E{Key: "color", Value: category.Color},
 				primitive.E{Key: "reminder_type", Value: category.ReminderType},
-				primitive.E{Key: "date_updated", Value: time.Now()},
+				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 			}},
 		}
 		_, err = sa.db.todoCategories.UpdateOneWithContext(sessionContext, filter, update, nil)
@@ -291,7 +291,7 @@ func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, ca
 	category.OrgID = orgID
 	category.AppID = appID
 	category.UserID = userID
-	category.DateCreated = time.Now()
+	category.DateCreated = time.Now().UTC()
 
 	_, err := sa.db.todoEntries.InsertOne(&category)
 	if err != nil {
@@ -318,7 +318,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "due_date_time", Value: todo.DueDateTime},
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
-			primitive.E{Key: "date_updated", Value: time.Now()},
+			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
 	_, err := sa.db.todoEntries.UpdateOne(filter, update, nil)
@@ -391,7 +391,7 @@ func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.
 	filter := bson.D{
 		primitive.E{Key: "completed", Value: false},
 		primitive.E{Key: "has_due_time", Value: true},
-		primitive.E{Key: "reminder_date_time", Value: []primitive.E{
+		primitive.E{Key: "due_date_time", Value: []primitive.E{
 			{Key: "$gte", Value: startDate},
 			{Key: "$lte", Value: endDate},
 		}},
