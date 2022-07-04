@@ -144,7 +144,6 @@ func (sa *Adapter) UpdateTodoCategory(appID string, orgID string, userID string,
 			primitive.E{Key: "$set", Value: bson.D{
 				primitive.E{Key: "name", Value: category.Name},
 				primitive.E{Key: "color", Value: category.Color},
-				primitive.E{Key: "reminder_type", Value: category.ReminderType},
 				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 			}},
 		}
@@ -316,6 +315,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "completed", Value: todo.Completed},
 			primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
 			primitive.E{Key: "due_date_time", Value: todo.DueDateTime},
+			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
