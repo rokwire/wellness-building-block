@@ -35,7 +35,7 @@ type TodoEntry struct {
 	Location         *string      `json:"location" bson:"location"`
 	Completed        bool         `json:"completed" bson:"completed"`
 	HasDueTime       bool         `json:"has_due_time" bson:"has_due_time"`
-	DueDateTime      time.Time    `json:"due_date_time" bson:"due_date_time"`
+	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
 	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
 	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
 	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
