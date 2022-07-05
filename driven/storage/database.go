@@ -38,6 +38,7 @@ type database struct {
 
 	todoCategories *collectionWrapper
 	todoEntries    *collectionWrapper
+	rings          *collectionWrapper
 }
 
 func (m *database) start() error {
@@ -76,8 +77,15 @@ func (m *database) start() error {
 		return err
 	}
 
+	rings := &collectionWrapper{database: m, coll: db.Collection("rings")}
+	err = m.applyRingsChecks(rings)
+	if err != nil {
+		return err
+	}
+
 	m.todoCategories = todoCategories
 	m.todoEntries = todoEntries
+	m.rings = rings
 
 	//asign the db, db client and the collections
 	m.db = db
@@ -160,5 +168,37 @@ func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
 	}
 
 	log.Println("todo_entries passed")
+	return nil
+}
+
+func (m *database) applyRingsChecks(entries *collectionWrapper) error {
+	log.Println("apply wellness_rings checks.....")
+
+	//Add org_id + app_id index
+	err := entries.AddIndex(
+		bson.D{primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add user_id index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add user_id index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	log.Println("wellness_rings passed")
 	return nil
 }

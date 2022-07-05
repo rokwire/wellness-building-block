@@ -123,3 +123,27 @@ func (app *Application) processReminders() error {
 
 	return nil
 }
+
+func (app *Application) getRings(appID string, orgID string, userID string) ([]model.Ring, error) {
+	return app.storage.GetRings(appID, orgID, userID)
+}
+
+func (app *Application) getRing(appID string, orgID string, userID string, id string) (*model.Ring, error) {
+	return app.storage.GetRing(appID, orgID, userID, id)
+}
+
+func (app *Application) createRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error) {
+	return app.storage.CreateRing(appID, orgID, userID, category)
+}
+
+func (app *Application) deleteRing(appID string, orgID string, userID string, id string) error {
+	return app.storage.DeleteRing(appID, orgID, userID, id)
+}
+
+func (app *Application) createRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error) {
+	return app.storage.CreateRingHistory(appID, orgID, userID, ringID, ringHistory)
+}
+
+func (app *Application) deleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error) {
+	return app.storage.DeleteRingHistory(appID, orgID, userID, ringID, ringHistoryID)
+}

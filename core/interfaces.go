@@ -40,6 +40,13 @@ type Services interface {
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
 
 	ProcessReminders() error
+
+	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
+	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)
+	CreateRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error)
+	DeleteRing(appID string, orgID string, userID string, id string) error
+	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
+	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
 }
 
 type servicesImpl struct {
@@ -98,6 +105,30 @@ func (s *servicesImpl) ProcessReminders() error {
 	return s.app.processReminders()
 }
 
+func (s *servicesImpl) GetRings(appID string, orgID string, userID string) ([]model.Ring, error) {
+	return s.app.storage.GetRings(appID, orgID, userID)
+}
+
+func (s *servicesImpl) GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error) {
+	return s.app.storage.GetRing(appID, orgID, userID, id)
+}
+
+func (s *servicesImpl) CreateRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error) {
+	return s.app.storage.CreateRing(appID, orgID, userID, category)
+}
+
+func (s *servicesImpl) DeleteRing(appID string, orgID string, userID string, id string) error {
+	return s.app.storage.DeleteRing(appID, orgID, userID, id)
+}
+
+func (s *servicesImpl) CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error) {
+	return s.app.storage.CreateRingHistory(appID, orgID, userID, ringID, ringHistory)
+}
+
+func (s *servicesImpl) DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error) {
+	return s.app.storage.DeleteRingHistory(appID, orgID, userID, ringID, ringHistoryID)
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	GetTodoCategories(appID string, orgID string, userID string) ([]model.TodoCategory, error)
@@ -114,6 +145,13 @@ type Storage interface {
 	UpdateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
+
+	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
+	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)
+	CreateRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error)
+	DeleteRing(appID string, orgID string, userID string, id string) error
+	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
+	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
 }
 
 // Notifications wrapper

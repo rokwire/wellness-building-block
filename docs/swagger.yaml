@@ -9,6 +9,56 @@ info:
   title: Rokwire Wellness Building Block API
   version: 1.0.1
 paths:
+  /api/user/rings:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all user wellness ring entries
+      operationId: GetUserRings
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    post:
+      consumes:
+      - application/json
+      description: Creates a user wellness ring entry
+      operationId: CreateUserRing
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /api/user/rings/{id}:
+    delete:
+      description: Deletes a user wellness ring entry with the specified id
+      operationId: DeleteUserRing
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user wellness ring entry by id
+      operationId: GetUserRing
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /api/user/todo_categories:
     get:
       consumes:
