@@ -26,6 +26,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 	"wellness/core"
 	"wellness/core/model"
 )
@@ -428,7 +429,7 @@ func (h ApisHandler) DeleteUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 // @ID DeleteCompletedUserTodoEntry
 // @Success 200
 // @Security UserAuth
-// @Router /user/todo_entries/clear_completed_entries [delete]
+// @Router /api/user/todo_entries/clear_completed_entries [delete]
 func (h ApisHandler) DeleteCompletedUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -490,7 +491,7 @@ func (h ApisHandler) GetUserRing(claims *tokenauth.Claims, w http.ResponseWriter
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetTodoEntry(claims.AppID, claims.OrgID, claims.Subject, id)
+	resData, err := h.app.Services.GetRing(claims.AppID, claims.OrgID, claims.Subject, id)
 	if err != nil {
 		log.Printf("Error on getting user wellness ring entry by id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -550,11 +551,12 @@ func (h ApisHandler) CreateUserRing(claims *tokenauth.Claims, w http.ResponseWri
 
 	createdItem, err := h.app.Services.CreateRing(claims.AppID, claims.OrgID, claims.Subject, &model.Ring{
 		History: []model.RingHistoryEntry{{
-			ID:    uuid.NewString(),
-			Color: historyEntry.Color,
-			Name:  historyEntry.Name,
-			Unit:  historyEntry.Unit,
-			Value: historyEntry.Value,
+			ID:          uuid.NewString(),
+			Color:       historyEntry.Color,
+			Name:        historyEntry.Name,
+			Unit:        historyEntry.Unit,
+			Value:       historyEntry.Value,
+			DateCreated: time.Now().UTC(),
 		}},
 	})
 	if err != nil {
@@ -589,6 +591,108 @@ func (h ApisHandler) DeleteUserRing(claims *tokenauth.Claims, w http.ResponseWri
 	err := h.app.Services.DeleteRing(claims.AppID, claims.OrgID, claims.Subject, id)
 	if err != nil {
 		log.Printf("Error on deleting user wellness ring entry with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// CreateUserRingHistoryEntry Creates a user wellness ring history entry
+// @Description Creates a user wellness ring history entry
+// @Tags Client
+// @ID CreateUserRingHistoryEntry
+// @Accept json
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/rings/{id}/history [post]
+func (h ApisHandler) CreateUserRingHistoryEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal create a user wellness ring history entry - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var historyEntry createUserRingRequestBody
+	err = json.Unmarshal(data, &historyEntry)
+	if err != nil {
+		log.Printf("Error on unmarshal the create user wellness ring history entry request data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.GetRing(claims.AppID, claims.OrgID, claims.Subject, id)
+	if err != nil {
+		log.Printf("Error on creating user wellness ring history entry: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		log.Printf("Error on creating user wellness ring history entry: %s\n Not found", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	createdItem, err := h.app.Services.CreateRingHistory(claims.AppID, claims.OrgID, claims.Subject, id, &model.RingHistoryEntry{
+		ID:          uuid.NewString(),
+		Color:       historyEntry.Color,
+		Name:        historyEntry.Name,
+		Unit:        historyEntry.Unit,
+		Value:       historyEntry.Value,
+		DateCreated: time.Now().UTC(),
+	})
+	if err != nil {
+		log.Printf("Error on creating user wellness ring history entry: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(createdItem)
+	if err != nil {
+		log.Printf("Error on marshal the new user wellness ring history entry: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// DeleteUserRingHistoryEntry Deletes a user wellness ring history entry with the specified id & history id
+// @Description Deletes a user wellness ring history entry with the specified id & history id
+// @Tags Client
+// @ID DeleteUserRingHistoryEntry
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/rings/{id}/history/{history-id} [delete]
+func (h ApisHandler) DeleteUserRingHistoryEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	historyID := vars["history-id"]
+
+	resData, err := h.app.Services.GetRing(claims.AppID, claims.OrgID, claims.Subject, id)
+	if err != nil {
+		log.Printf("Error on deleting user wellness ring history entry: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		log.Printf("Error on deleting user wellness ring history entry: %s\n Not found", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	_, err = h.app.Services.DeleteRingHistory(claims.AppID, claims.OrgID, claims.Subject, id, historyID)
+	if err != nil {
+		log.Printf("Error on deleting user wellness ring history entry with id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

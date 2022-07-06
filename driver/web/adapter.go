@@ -100,6 +100,13 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/user/todo_entries/{id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("PUT")
 	subRouter.HandleFunc("/user/todo_entries/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserTodoEntry, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
+	// handle user wellness rings apis
+	subRouter.HandleFunc("/user/rings", we.coreAuthWrapFunc(we.apisHandler.GetUserRings, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/rings/{id}", we.coreAuthWrapFunc(we.apisHandler.GetUserRing, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/rings", we.coreAuthWrapFunc(we.apisHandler.CreateUserRing, we.auth.coreAuth.standardAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/rings/{id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRing, we.auth.coreAuth.standardAuth)).Methods("DELETE")
+	subRouter.HandleFunc("/user/rings/{id}/history", we.coreAuthWrapFunc(we.apisHandler.CreateUserRingHistoryEntry, we.auth.coreAuth.standardAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/rings/{id}/history/{history-id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRingHistoryEntry, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 

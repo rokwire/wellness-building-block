@@ -446,18 +446,18 @@ func (sa *Adapter) GetRing(appID string, orgID string, userID string, id string)
 }
 
 // CreateRing create a user wellness ring
-func (sa *Adapter) CreateRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error) {
-	category.ID = uuid.NewString()
-	category.OrgID = orgID
-	category.AppID = appID
-	category.UserID = userID
-	category.DateCreated = time.Now().UTC()
+func (sa *Adapter) CreateRing(appID string, orgID string, userID string, ring *model.Ring) (*model.Ring, error) {
+	ring.ID = uuid.NewString()
+	ring.OrgID = orgID
+	ring.AppID = appID
+	ring.UserID = userID
+	ring.DateCreated = time.Now().UTC()
 
-	_, err := sa.db.rings.InsertOne(&category)
+	_, err := sa.db.rings.InsertOne(&ring)
 	if err != nil {
 		return nil, err
 	}
-	return category, nil
+	return ring, nil
 }
 
 // DeleteRing deletes a user wellness ring
@@ -525,17 +525,19 @@ func (sa *Adapter) DeleteRingHistory(appID string, orgID string, userID string, 
 		primitive.E{Key: "_id", Value: ringID}}
 	update := bson.D{
 		primitive.E{Key: "$pull", Value: bson.D{
-			primitive.E{Key: "history", Value: primitive.E{Key: "id", Value: ringHistoryID}},
+			primitive.E{Key: "history", Value: primitive.M{"id": ringHistoryID}},
 		}},
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
-	_, err = sa.db.rings.UpdateOne(filter, update, nil)
+	res, err := sa.db.rings.UpdateOne(filter, update, nil)
+
 	if err != nil {
 		log.Printf("error updating ring history entry: %s", err)
 		return nil, fmt.Errorf("error updating ring history entry: %s", err)
 	}
+	_ = res
 
 	return sa.GetRing(appID, orgID, userID, ringID)
 }

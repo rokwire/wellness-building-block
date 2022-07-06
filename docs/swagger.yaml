@@ -59,6 +59,31 @@ paths:
       - UserAuth: []
       tags:
       - Client
+  /api/user/rings/{id}/history:
+    post:
+      consumes:
+      - application/json
+      description: Creates a user wellness ring history entry
+      operationId: CreateUserRingHistoryEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
+  /api/user/rings/{id}/history/{history-id}:
+    delete:
+      description: Deletes a user wellness ring history entry with the specified id
+        & history id
+      operationId: DeleteUserRingHistoryEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /api/user/todo_categories:
     get:
       consumes:
@@ -187,6 +212,17 @@ paths:
       - UserAuth: []
       tags:
       - Client
+  /api/user/todo_entries/clear_completed_entries:
+    delete:
+      description: Deletes all completed user todo entries
+      operationId: DeleteCompletedUserTodoEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /int/process_reminders:
     post:
       description: Process reminders. Invoked by AWS Scheduler API
@@ -198,17 +234,6 @@ paths:
       - InternalAPIAuth: []
       tags:
       - Internal
-  /user/todo_entries/clear_completed_entries:
-    delete:
-      description: Deletes all completed user todo entries
-      operationId: DeleteCompletedUserTodoEntry
-      responses:
-        "200":
-          description: ""
-      security:
-      - UserAuth: []
-      tags:
-      - Client
   /version:
     get:
       description: Gives the service version.

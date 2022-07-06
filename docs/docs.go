@@ -104,6 +104,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user/rings/{id}/history": {
+            "post": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Creates a user wellness ring history entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "CreateUserRingHistoryEntry",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/user/rings/{id}/history/{history-id}": {
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes a user wellness ring history entry with the specified id \u0026 history id",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "DeleteUserRingHistoryEntry",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/user/todo_categories": {
             "get": {
                 "security": [
@@ -253,6 +294,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user/todo_entries/clear_completed_entries": {
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes all completed user todo entries",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "DeleteCompletedUserTodoEntry",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/user/todo_entries/{id}": {
             "get": {
                 "security": [
@@ -330,25 +390,6 @@ const docTemplate = `{
                     "Internal"
                 ],
                 "operationId": "ProcessReminders",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/user/todo_entries/clear_completed_entries": {
-            "delete": {
-                "security": [
-                    {
-                        "UserAuth": []
-                    }
-                ],
-                "description": "Deletes all completed user todo entries",
-                "tags": [
-                    "Client"
-                ],
-                "operationId": "DeleteCompletedUserTodoEntry",
                 "responses": {
                     "200": {
                         "description": ""
