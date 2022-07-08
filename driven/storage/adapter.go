@@ -531,15 +531,138 @@ func (sa *Adapter) DeleteRingHistory(appID string, orgID string, userID string, 
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
-	res, err := sa.db.rings.UpdateOne(filter, update, nil)
-
+	_, err = sa.db.rings.UpdateOne(filter, update, nil)
 	if err != nil {
 		log.Printf("error updating ring history entry: %s", err)
 		return nil, fmt.Errorf("error updating ring history entry: %s", err)
 	}
-	_ = res
 
 	return sa.GetRing(appID, orgID, userID, ringID)
+}
+
+// GetRingsRecords Get all ring records for the corresponding ring id
+func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "ring_id", Value: ringID},
+	}
+
+	if startDateEpoch != nil {
+		seconds := *startDateEpoch / 1000
+		timeValue := time.Unix(seconds, 0)
+		filter = append(filter, primitive.E{Key: "date_created", Value: bson.D{primitive.E{Key: "$gte", Value: &timeValue}}})
+	}
+	if endDateEpoch != nil {
+		seconds := *endDateEpoch / 1000
+		timeValue := time.Unix(seconds, 0)
+		filter = append(filter, primitive.E{Key: "date_created", Value: bson.D{primitive.E{Key: "$lte", Value: &timeValue}}})
+	}
+
+	findOptions := options.Find()
+	if order != nil && *order == "asc" {
+		findOptions.SetSort(bson.D{{"date_created", 1}})
+	} else {
+		findOptions.SetSort(bson.D{{"date_created", -1}})
+	}
+	if limit != nil {
+		findOptions.SetLimit(*limit)
+	}
+	if offset != nil {
+		findOptions.SetSkip(*offset)
+	}
+
+	var list []model.RingRecord
+	err := sa.db.ringsRecords.Find(filter, &list, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// GetRingsRecord gets a single ring record by id
+func (sa *Adapter) GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error) {
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "_id", Value: id},
+	}
+
+	var list []model.RingRecord
+	err := sa.db.ringsRecords.Find(filter, &list, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) > 0 {
+		return &list[0], nil
+	}
+
+	return nil, nil
+}
+
+// CreateRingsRecord creates a new ring record
+func (sa *Adapter) CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error) {
+	record.ID = uuid.NewString()
+	record.OrgID = orgID
+	record.AppID = appID
+	record.UserID = userID
+	record.DateCreated = time.Now().UTC()
+
+	_, err := sa.db.ringsRecords.InsertOne(&record)
+	if err != nil {
+		return nil, err
+	}
+
+	return sa.GetRingsRecord(appID, orgID, userID, record.RingID)
+}
+
+// UpdateRingsRecord updates a ring record
+func (sa *Adapter) UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error) {
+	now := time.Now().UTC()
+	record.DateUpdated = &now
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "_id", Value: record.ID}}
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "value", Value: record.Value},
+			primitive.E{Key: "date_updated", Value: record},
+		}},
+	}
+
+	_, err := sa.db.ringsRecords.UpdateOne(filter, update, nil)
+	if err != nil {
+		log.Printf("error delete a ring record: %s", err)
+		return nil, fmt.Errorf("error delete a ring record: %s", err)
+	}
+
+	return sa.GetRingsRecord(appID, orgID, userID, record.RingID)
+}
+
+// DeleteRingsRecord deletes a ring record
+func (sa *Adapter) DeleteRingsRecord(appID string, orgID string, userID string, ringID string, recordID string) error {
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "ring_id", Value: ringID},
+		primitive.E{Key: "_id", Value: recordID}}
+
+	res, err := sa.db.ringsRecords.DeleteOne(filter, nil)
+	if err != nil {
+		log.Printf("error delete a ring record: %s", err)
+		return fmt.Errorf("error delete a ring record: %s", err)
+	}
+
+	_ = res
+
+	return nil
 }
 
 func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {

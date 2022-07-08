@@ -51,10 +51,10 @@ func (h ApisHandler) Version(w http.ResponseWriter, r *http.Request) {
 
 // GetUserTodoCategories Retrieves all user todo categories
 // @Description Retrieves all user todo categories
-// @Tags Client
+// @Tags Client-TodoCategories
 // @ID GetUserTodoCategories
 // @Accept json
-// @Success 200
+// @Success 200 {array} model.TodoCategory
 // @Security UserAuth
 // @Router  /api/user/todo_categories [get]
 func (h ApisHandler) GetUserTodoCategories(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -84,11 +84,11 @@ func (h ApisHandler) GetUserTodoCategories(claims *tokenauth.Claims, w http.Resp
 
 // GetUserTodoCategory Retrieves a user todo category by id
 // @Description Retrieves a user todo category by id
-// @Tags Client
+// @Tags Client-TodoCategories
 // @ID GetUserTodoCategory
 // @Accept json
 // @Produce json
-// @Success 200
+// @Success 200 {object} model.TodoCategory
 // @Security UserAuth
 // @Router  /api/user/todo_categories/{id} [get]
 func (h ApisHandler) GetUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -116,11 +116,12 @@ func (h ApisHandler) GetUserTodoCategory(claims *tokenauth.Claims, w http.Respon
 
 // UpdateUserTodoCategory Updates a user todo category with the specified id
 // @Description Updates a user todo category with the specified id
-// @Tags Client
+// @Tags Client-TodoCategories
 // @ID UpdateUserTodoCategory
 // @Accept json
 // @Produce json
-// @Success 200
+// @Param data body model.TodoCategory true "body json"
+// @Success 200 {object} model.TodoCategory
 // @Security UserAuth
 // @Router /api/user/todo_categories/{id} [put]
 func (h ApisHandler) UpdateUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -169,10 +170,10 @@ func (h ApisHandler) UpdateUserTodoCategory(claims *tokenauth.Claims, w http.Res
 
 // CreateUserTodoCategory Creates a user todo category
 // @Description Creates a user todo category
-// @Tags Client
+// @Tags Client-TodoCategories
 // @ID CreateUserTodoCategory
-// @Accept json
-// @Success 200
+// @Param data body model.TodoCategory true "body json"
+// @Success 200 {object} model.TodoCategory
 // @Security UserAuth
 // @Router /api/user/todo_categories [post]
 func (h ApisHandler) CreateUserTodoCategory(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -213,7 +214,7 @@ func (h ApisHandler) CreateUserTodoCategory(claims *tokenauth.Claims, w http.Res
 
 // DeleteUserTodoCategory Deletes a user todo category with the specified id
 // @Description Deletes a user todo category with the specified id
-// @Tags Client
+// @Tags Client-TodoCategories
 // @ID DeleteUserTodoCategory
 // @Success 200
 // @Security UserAuth
@@ -235,10 +236,10 @@ func (h ApisHandler) DeleteUserTodoCategory(claims *tokenauth.Claims, w http.Res
 
 // GetUserTodoEntries Retrieves all user todo entries
 // @Description Retrieves all user todo entries
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID GetUserTodoEntries
 // @Accept json
-// @Success 200
+// @Success 200 {array} model.TodoEntry
 // @Security UserAuth
 // @Router  /api/user/todo_entries [get]
 func (h ApisHandler) GetUserTodoEntries(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -268,11 +269,10 @@ func (h ApisHandler) GetUserTodoEntries(claims *tokenauth.Claims, w http.Respons
 
 // GetUserTodoEntry Retrieves a user todo entry by id
 // @Description Retrieves a user todo entry by id
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID GetUserTodoEntry
-// @Accept json
 // @Produce json
-// @Success 200
+// @Success 200 {object} model.TodoEntry
 // @Security UserAuth
 // @Router  /api/user/todo_entries/{id} [get]
 func (h ApisHandler) GetUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -306,11 +306,12 @@ func (h ApisHandler) GetUserTodoEntry(claims *tokenauth.Claims, w http.ResponseW
 
 // UpdateUserTodoEntry Updates a user todo entry with the specified id
 // @Description Updates a user todo entry with the specified id
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID UpdateUserTodoEntry
 // @Accept json
 // @Produce json
-// @Success 200
+// @Param data body model.TodoEntry true "body json"
+// @Success 200 {object} model.TodoEntry
 // @Security UserAuth
 // @Router /api/user/todo_entries/{id} [put]
 func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -359,10 +360,12 @@ func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 
 // CreateUserTodoEntry Creates a user todo entry
 // @Description Creates a user todo entry
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID CreateUserTodoEntry
 // @Accept json
-// @Success 200
+// @Produce json
+// @Param data body model.TodoEntry true "body json"
+// @Success 200 {object} model.TodoEntry
 // @Security UserAuth
 // @Router /api/user/todo_entries [post]
 func (h ApisHandler) CreateUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -403,7 +406,7 @@ func (h ApisHandler) CreateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 
 // DeleteUserTodoEntry Deletes a user todo entry with the specified id
 // @Description Deletes a user todo entry with the specified id
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID DeleteUserTodoEntry
 // @Success 200
 // @Security UserAuth
@@ -425,7 +428,7 @@ func (h ApisHandler) DeleteUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 
 // DeleteCompletedUserTodoEntry Deletes all completed user todo entries
 // @Description Deletes all completed user todo entries
-// @Tags Client
+// @Tags Client-TodoEntries
 // @ID DeleteCompletedUserTodoEntry
 // @Success 200
 // @Security UserAuth
@@ -447,10 +450,10 @@ func (h ApisHandler) DeleteCompletedUserTodoEntry(claims *tokenauth.Claims, w ht
 
 // GetUserRings Retrieves all user wellness ring entries
 // @Description Retrieves all user wellness ring entries
-// @Tags Client
+// @Tags Client-Rings
 // @ID GetUserRings
 // @Accept json
-// @Success 200
+// @Success 200 {array} model.Ring
 // @Security UserAuth
 // @Router  /api/user/rings [get]
 func (h ApisHandler) GetUserRings(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -480,11 +483,12 @@ func (h ApisHandler) GetUserRings(claims *tokenauth.Claims, w http.ResponseWrite
 
 // GetUserRing Retrieves a user wellness ring entry by id
 // @Description Retrieves a user wellness ring entry by id
-// @Tags Client
+// @Tags Client-Rings
 // @ID GetUserRing
 // @Accept json
 // @Produce json
-// @Success 200
+// @Param data body model.Ring true "body json"
+// @Success 200 {object} model.Ring
 // @Security UserAuth
 // @Router  /api/user/rings/{id} [get]
 func (h ApisHandler) GetUserRing(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -526,10 +530,11 @@ type createUserRingRequestBody struct {
 
 // CreateUserRing Creates a user wellness ring entry
 // @Description Creates a user wellness ring entry
-// @Tags Client
+// @Tags Client-Rings
 // @ID CreateUserRing
 // @Accept json
-// @Success 200
+// @Param data body model.Ring true "body json"
+// @Success 200 {object} model.Ring
 // @Security UserAuth
 // @Router /api/user/rings [post]
 func (h ApisHandler) CreateUserRing(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -579,9 +584,8 @@ func (h ApisHandler) CreateUserRing(claims *tokenauth.Claims, w http.ResponseWri
 
 // DeleteUserRing Deletes a user wellness ring entry with the specified id
 // @Description Deletes a user wellness ring entry with the specified id
-// @Tags Client
+// @Tags Client-Rings
 // @ID DeleteUserRing
-// @Success 200
 // @Security UserAuth
 // @Router /api/user/rings/{id} [delete]
 func (h ApisHandler) DeleteUserRing(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
@@ -601,9 +605,10 @@ func (h ApisHandler) DeleteUserRing(claims *tokenauth.Claims, w http.ResponseWri
 
 // CreateUserRingHistoryEntry Creates a user wellness ring history entry
 // @Description Creates a user wellness ring history entry
-// @Tags Client
+// @Tags Client-Rings
 // @ID CreateUserRingHistoryEntry
 // @Accept json
+// @Param data body createUserRingRequestBody true "body json"
 // @Success 200
 // @Security UserAuth
 // @Router /api/user/rings/{id}/history [post]
@@ -667,7 +672,7 @@ func (h ApisHandler) CreateUserRingHistoryEntry(claims *tokenauth.Claims, w http
 
 // DeleteUserRingHistoryEntry Deletes a user wellness ring history entry with the specified id & history id
 // @Description Deletes a user wellness ring history entry with the specified id & history id
-// @Tags Client
+// @Tags Client-Rings
 // @ID DeleteUserRingHistoryEntry
 // @Success 200
 // @Security UserAuth
@@ -693,6 +698,247 @@ func (h ApisHandler) DeleteUserRingHistoryEntry(claims *tokenauth.Claims, w http
 	_, err = h.app.Services.DeleteRingHistory(claims.AppID, claims.OrgID, claims.Subject, id, historyID)
 	if err != nil {
 		log.Printf("Error on deleting user wellness ring history entry with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// GetUserRingRecords Retrieves all user ring record
+// @Description Retrieves all user ring record
+// @Tags Client-RingsRecords
+// @ID GetUserRingRecords
+// @Param offset query string false "offset"
+// @Param limit query string false "limit - limit the result"
+// @Param order query string false "order - Possible values: asc, desc. Default: desc"
+// @Param start_date query string false "start_date - Start date filter in milliseconds as an integer epoch value"
+// @Param end_date query string false "end_date - End date filter in milliseconds as an integer epoch value"
+// @Success 200 {array} model.RingRecord
+// @Security UserAuth
+// @Router  /api/user/rings/{id}/records [get]
+func (h ApisHandler) GetUserRingRecords(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	offsetFilter := getInt64QueryParam(r, "offset")
+	limitFilter := getInt64QueryParam(r, "limit")
+	orderFilter := getStringQueryParam(r, "order")
+	startDateFilter := getInt64QueryParam(r, "start_date")
+	endDateFilter := getInt64QueryParam(r, "end_date")
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resData, err := h.app.Services.GetRingsRecords(claims.AppID, claims.OrgID, claims.Subject, id, startDateFilter, endDateFilter, offsetFilter, limitFilter, orderFilter)
+	if err != nil {
+		log.Printf("Error on getting user ring records- %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		resData = []model.RingRecord{}
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal all user ring records: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// GetUserGetUserRingRecord Retrieves a user ring record by id
+// @Description Retrieves a user ring record by id
+// @Tags Client-RingsRecords
+// @ID GetUserGetUserRingRecord
+// @Produce json
+// @Success 200 {array} model.RingRecord
+// @Security UserAuth
+// @Router  /api/user/rings/{id}/records/{record-id} [get]
+func (h ApisHandler) GetUserGetUserRingRecord(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	recordID := vars["record-id"]
+
+	resData, err := h.app.Services.GetRingsRecord(claims.AppID, claims.OrgID, claims.Subject, recordID)
+	if err != nil {
+		log.Printf("Error on getting user ring record by id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal user ring record: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// UpdateUserRingRecord Updates a user ring record with the specified id
+// @Description Updates a user ring record with the specified id
+// @Tags Client-RingsRecords
+// @ID UpdateUserRingRecord
+// @Accept json
+// @Produce json
+// @Param data body model.RingRecord true "body json"
+// @Success 200 {array} model.RingRecord
+// @Security UserAuth
+// @Router /api/user/rings/{id}/records/{record-id} [put]
+func (h ApisHandler) UpdateUserRingRecord(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	recordID := vars["record-id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal create a user ring record - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	ring, err := h.app.Services.GetRingsRecord(claims.AppID, claims.OrgID, claims.Subject, recordID)
+	if err != nil || ring == nil {
+		if err != nil {
+			log.Printf("Error on marshal create a user ring record - ring not found %s\n", err)
+		} else {
+			log.Printf("Error on marshal create a user ring record - ring not found\n")
+
+		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusBadRequest)
+		return
+	}
+
+	var item model.RingRecord
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on unmarshal the create user ring record request data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if recordID != item.ID || item.RingID != id {
+		log.Printf("Inconsistent attempt to update query param  and json id are not equal")
+		http.Error(w, "Inconsistent attempt to update query param  and json id are not equal", http.StatusBadRequest)
+		return
+	}
+
+	resData, err := h.app.Services.UpdateRingsRecord(claims.AppID, claims.OrgID, claims.Subject, &item)
+	if err != nil {
+		log.Printf("Error on updating user ring record with id - %s\n %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal the updated user ring record: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// createUserRingRecordRequestBody represents individual daily record for an individual ring as a request body
+type createUserRingRecordRequestBody struct {
+	RingID string  `json:"ring_id" bson:"ring_id"`
+	Value  float64 `json:"value" bson:"value"`
+} //@name createUserRingRecordRequestBody
+
+// CreateUserRingRecord Creates a user ring record
+// @Description Creates a user ring record
+// @Tags Client-RingsRecords
+// @ID CreateUserRingRecord
+// @Accept json
+// @Param data body createUserRingRecordRequestBody true "body json"
+// @Success 200 {array} model.RingRecord
+// @Security UserAuth
+// @Router /api/user/rings/{id}/records [post]
+func (h ApisHandler) CreateUserRingRecord(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal create a user ring record - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	ring, err := h.app.Services.GetRing(claims.AppID, claims.OrgID, claims.Subject, id)
+	if err != nil || ring == nil {
+		log.Printf("Error on marshal create a user ring record - ring not found %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var item createUserRingRecordRequestBody
+	err = json.Unmarshal(data, &item)
+	if err != nil {
+		log.Printf("Error on unmarshal the create user ring record request data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if item.RingID == "" {
+		log.Printf("api.CreateUserRingRecord() - missing ring_id\n")
+		http.Error(w, "api.CreateUserRingRecord() - missing ring_id", http.StatusBadRequest)
+		return
+	}
+
+	if item.RingID != id {
+		log.Printf("api.CreateUserRingRecord() - ring id is different")
+		http.Error(w, "api.CreateUserRingRecord() - ring id is different", http.StatusBadRequest)
+		return
+	}
+
+	createdItem, err := h.app.Services.CreateRingsRecord(claims.AppID, claims.OrgID, claims.Subject, &model.RingRecord{
+		RingID: item.RingID,
+		Value:  item.Value,
+	})
+	if err != nil {
+		log.Printf("Error on creating user ring record: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(createdItem)
+	if err != nil {
+		log.Printf("Error on marshal the new user ring record: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// DeleteUserRingRecord Deletes a user ring record with the specified id
+// @Description Deletes a user ring record with the specified id
+// @Tags Client-RingsRecords
+// @ID DeleteUserRingRecord
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/rings/{id}/records/{record-id} [delete]
+func (h ApisHandler) DeleteUserRingRecord(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ringID := vars["id"]
+	recordID := vars["record-id"]
+
+	err := h.app.Services.DeleteRingsRecord(claims.AppID, claims.OrgID, claims.Subject, ringID, recordID)
+	if err != nil {
+		log.Printf("Error on deleting user ring record with id - %s\n %s", recordID, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

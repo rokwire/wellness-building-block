@@ -32,12 +32,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "GetUserRings",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Ring"
+                            }
+                        }
                     }
                 }
             },
@@ -52,12 +58,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "CreateUserRing",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Ring"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Ring"
+                        }
                     }
                 }
             }
@@ -77,12 +97,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "GetUserRing",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Ring"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Ring"
+                        }
                     }
                 }
             },
@@ -94,14 +128,10 @@ const docTemplate = `{
                 ],
                 "description": "Deletes a user wellness ring entry with the specified id",
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "DeleteUserRing",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
+                "responses": {}
             }
         },
         "/api/user/rings/{id}/history": {
@@ -116,9 +146,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "CreateUserRingHistoryEntry",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/createUserRingRequestBody"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -135,9 +176,188 @@ const docTemplate = `{
                 ],
                 "description": "Deletes a user wellness ring history entry with the specified id \u0026 history id",
                 "tags": [
-                    "Client"
+                    "Client-Rings"
                 ],
                 "operationId": "DeleteUserRingHistoryEntry",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/user/rings/{id}/records": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves all user ring record",
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "GetUserRingRecords",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order - Possible values: asc, desc. Default: desc",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "start_date - Start date filter in milliseconds as an integer epoch value",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "end_date - End date filter in milliseconds as an integer epoch value",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RingRecord"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Creates a user ring record",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "CreateUserRingRecord",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/createUserRingRecordRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RingRecord"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/rings/{id}/records/{record-id}": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves a user ring record by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "GetUserGetUserRingRecord",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RingRecord"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Updates a user ring record with the specified id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "UpdateUserRingRecord",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RingRecord"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RingRecord"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes a user ring record with the specified id",
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "DeleteUserRingRecord",
                 "responses": {
                     "200": {
                         "description": ""
@@ -157,12 +377,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoCategories"
                 ],
                 "operationId": "GetUserTodoCategories",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TodoCategory"
+                            }
+                        }
                     }
                 }
             },
@@ -173,16 +399,27 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Creates a user todo category",
-                "consumes": [
-                    "application/json"
-                ],
                 "tags": [
-                    "Client"
+                    "Client-TodoCategories"
                 ],
                 "operationId": "CreateUserTodoCategory",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TodoCategory"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoCategory"
+                        }
                     }
                 }
             }
@@ -202,12 +439,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoCategories"
                 ],
                 "operationId": "GetUserTodoCategory",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoCategory"
+                        }
                     }
                 }
             },
@@ -225,12 +465,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoCategories"
                 ],
                 "operationId": "UpdateUserTodoCategory",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TodoCategory"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoCategory"
+                        }
                     }
                 }
             },
@@ -242,7 +496,7 @@ const docTemplate = `{
                 ],
                 "description": "Deletes a user todo category with the specified id",
                 "tags": [
-                    "Client"
+                    "Client-TodoCategories"
                 ],
                 "operationId": "DeleteUserTodoCategory",
                 "responses": {
@@ -264,12 +518,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "GetUserTodoEntries",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TodoEntry"
+                            }
+                        }
                     }
                 }
             },
@@ -283,13 +543,30 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "CreateUserTodoEntry",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TodoEntry"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoEntry"
+                        }
                     }
                 }
             }
@@ -303,7 +580,7 @@ const docTemplate = `{
                 ],
                 "description": "Deletes all completed user todo entries",
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "DeleteCompletedUserTodoEntry",
                 "responses": {
@@ -321,19 +598,19 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Retrieves a user todo entry by id",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "GetUserTodoEntry",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoEntry"
+                        }
                     }
                 }
             },
@@ -351,12 +628,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "UpdateUserTodoEntry",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TodoEntry"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TodoEntry"
+                        }
                     }
                 }
             },
@@ -368,7 +659,7 @@ const docTemplate = `{
                 ],
                 "description": "Deletes a user todo entry with the specified id",
                 "tags": [
-                    "Client"
+                    "Client-TodoEntries"
                 ],
                 "operationId": "DeleteUserTodoEntry",
                 "responses": {
@@ -411,6 +702,228 @@ const docTemplate = `{
                     "200": {
                         "description": ""
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CategoryRef": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "Ring": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RingHistoryEntry"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "RingHistoryEntry": {
+            "type": "object",
+            "properties": {
+                "color_hex": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "RingRecord": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "ring_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "TodoCategory": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "TodoEntry": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/CategoryRef"
+                },
+                "completed": {
+                    "type": "boolean"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "date_updated": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date_time": {
+                    "type": "string"
+                },
+                "has_due_time": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "org_id": {
+                    "type": "string"
+                },
+                "reminder_date_time": {
+                    "type": "string"
+                },
+                "reminder_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "work_days": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "createUserRingRecordRequestBody": {
+            "type": "object",
+            "properties": {
+                "ring_id": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "createUserRingRequestBody": {
+            "type": "object",
+            "properties": {
+                "color_hex": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
                 }
             }
         }

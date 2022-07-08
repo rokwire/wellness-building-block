@@ -56,12 +56,12 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 	return app.storage.GetTodoEntry(appID, orgID, userID, id)
 }
 
-func (app *Application) createTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error) {
-	return app.storage.CreateTodoEntry(appID, orgID, userID, category)
+func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+	return app.storage.CreateTodoEntry(appID, orgID, userID, todo)
 }
 
-func (app *Application) updateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error) {
-	return app.storage.UpdateTodoEntry(appID, orgID, userID, category)
+func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+	return app.storage.UpdateTodoEntry(appID, orgID, userID, todo)
 }
 
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {
@@ -146,4 +146,24 @@ func (app *Application) createRingHistory(appID string, orgID string, userID str
 
 func (app *Application) deleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error) {
 	return app.storage.DeleteRingHistory(appID, orgID, userID, ringID, ringHistoryID)
+}
+
+func (app *Application) getRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
+	return app.storage.GetRingsRecords(appID, orgID, userID, ringID, startDateEpoch, endDateEpoch, offset, limit, order)
+}
+
+func (app *Application) getRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error) {
+	return app.storage.GetRingsRecord(appID, orgID, userID, id)
+}
+
+func (app *Application) createRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error) {
+	return app.storage.CreateRingsRecord(appID, orgID, userID, record)
+}
+
+func (app *Application) updateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error) {
+	return app.storage.UpdateRingsRecord(appID, orgID, userID, record)
+}
+
+func (app *Application) deleteRingsRecord(appID string, orgID string, userID string, ringID string, recordID string) error {
+	return app.storage.DeleteRingsRecord(appID, orgID, userID, ringID, recordID)
 }
