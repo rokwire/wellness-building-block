@@ -199,10 +199,12 @@ func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string,
 			return err
 		}
 
-		filter := bson.D{primitive.E{Key: "app_id", Value: appID},
+		filter := bson.D{
+			primitive.E{Key: "app_id", Value: appID},
 			primitive.E{Key: "org_id", Value: orgID},
 			primitive.E{Key: "user_id", Value: userID},
-			primitive.E{Key: "_id", Value: id}}
+			primitive.E{Key: "_id", Value: id},
+		}
 
 		_, err = sa.db.todoCategories.DeleteOneWithContext(sessionContext, filter, nil)
 		if err != nil {
@@ -215,7 +217,8 @@ func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string,
 			primitive.E{Key: "app_id", Value: appID},
 			primitive.E{Key: "org_id", Value: orgID},
 			primitive.E{Key: "user_id", Value: userID},
-			primitive.E{Key: "category.id", Value: id}}
+			primitive.E{Key: "category.id", Value: id},
+		}
 		update := bson.D{
 			primitive.E{Key: "$set", Value: bson.D{
 				primitive.E{Key: "category", Value: bson.TypeNull},
@@ -453,6 +456,10 @@ func (sa *Adapter) CreateRing(appID string, orgID string, userID string, ring *m
 	ring.UserID = userID
 	ring.DateCreated = time.Now().UTC()
 
+	for index, _ := range ring.History {
+		ring.History[index].RingID = ring.ID
+	}
+
 	_, err := sa.db.rings.InsertOne(&ring)
 	if err != nil {
 		return nil, err
@@ -462,16 +469,55 @@ func (sa *Adapter) CreateRing(appID string, orgID string, userID string, ring *m
 
 // DeleteRing deletes a user wellness ring
 func (sa *Adapter) DeleteRing(appID string, orgID string, userID string, id string) error {
-	filter := bson.D{
-		primitive.E{Key: "app_id", Value: appID},
-		primitive.E{Key: "org_id", Value: orgID},
-		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "_id", Value: id}}
 
-	_, err := sa.db.rings.DeleteOne(filter, nil)
+	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error starting a transaction - %s", err)
+			return err
+		}
+
+		filter := bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "_id", Value: id}}
+
+		_, err = sa.db.rings.DeleteOneWithContext(sessionContext, filter, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error deleting user ring: %s", err)
+			return err
+		}
+
+		filter = bson.D{
+			primitive.E{Key: "app_id", Value: appID},
+			primitive.E{Key: "org_id", Value: orgID},
+			primitive.E{Key: "user_id", Value: userID},
+			primitive.E{Key: "ring_id", Value: id}}
+
+		_, err = sa.db.ringsRecords.DeleteOneWithContext(sessionContext, filter, nil)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			log.Printf("error deleting user ring records: %s", err)
+			return err
+		}
+
+		//commit the transaction
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			sa.abortTransaction(sessionContext)
+			fmt.Println(err)
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		log.Printf("error deleting todo entry: %s", err)
-		return err
+		log.Printf("error deleting user ring: %s", err)
+		return fmt.Errorf("error deleting user ring: %s", err)
 	}
 
 	return nil
@@ -481,6 +527,7 @@ func (sa *Adapter) DeleteRing(appID string, orgID string, userID string, id stri
 func (sa *Adapter) CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error) {
 
 	ringHistory.ID = uuid.NewString()
+	ringHistory.RingID = ringID
 	ringHistory.DateCreated = time.Now().UTC()
 
 	filter := bson.D{

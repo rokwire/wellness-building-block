@@ -2,23 +2,6 @@ package model
 
 import "time"
 
-/*
-
-{
-	"id":"ldlkjdslkcdslknc",
-	"history":[
-		{
-			"id":"1dddd",
-			"color":"",
-			"name":"ddds",
-			"goal":4.0,
-			"date_created":"2022.2..."
-		}
-	]
-}
-
-*/
-
 // Ring represents wellness ring wrapper
 type Ring struct {
 	ID          string             `json:"id" bson:"_id"`
@@ -33,6 +16,7 @@ type Ring struct {
 // RingHistoryEntry represents single history entry
 type RingHistoryEntry struct {
 	ID          string     `json:"id" bson:"id"`
+	RingID      string     `json:"ring_id" bson:"ring_id"`
 	Color       string     `json:"color_hex" bson:"color_hex"`
 	Name        string     `json:"name" bson:"name"`
 	Unit        string     `json:"unit" bson:"unit"`
