@@ -128,8 +128,11 @@ func (m *database) applyTodoCategoriesChecks(categories *collectionWrapper) erro
 
 	//Add org_id + app_id index
 	err := categories.AddIndex(
-		bson.D{primitive.E{Key: "org_id", Value: 1},
-			primitive.E{Key: "app_id", Value: 1}},
+		bson.D{
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+		},
 		false)
 	if err != nil {
 		return err
@@ -150,10 +153,50 @@ func (m *database) applyTodoCategoriesChecks(categories *collectionWrapper) erro
 func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
 	log.Println("apply todo_entries checks.....")
 
-	//Add org_id + app_id index
 	err := entries.AddIndex(
-		bson.D{primitive.E{Key: "org_id", Value: 1},
-			primitive.E{Key: "app_id", Value: 1}},
+		bson.D{
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+			primitive.E{Key: "category.id", Value: 1},
+		},
+
+		false)
+	if err != nil {
+		return err
+	}
+
+	err = entries.AddIndex(
+		bson.D{
+			primitive.E{Key: "due_date_time", Value: -1},
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+			primitive.E{Key: "category.id", Value: 1},
+		},
+
+		false)
+	if err != nil {
+		return err
+	}
+
+	err = entries.AddIndex(
+		bson.D{
+			primitive.E{Key: "reminder_date_time", Value: -1},
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+			primitive.E{Key: "category.id", Value: 1},
+		},
+
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add category.id index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "category.id", Value: 1}},
 		false)
 	if err != nil {
 		return err
@@ -167,9 +210,17 @@ func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
 		return err
 	}
 
-	//Add user_id index
+	//Add due_date_time index
 	err = entries.AddIndex(
-		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		bson.D{primitive.E{Key: "due_date_time", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add reminder_date_time index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "reminder_date_time", Value: 1}},
 		false)
 	if err != nil {
 		return err
@@ -184,8 +235,11 @@ func (m *database) applyRingsChecks(entries *collectionWrapper) error {
 
 	//Add org_id + app_id index
 	err := entries.AddIndex(
-		bson.D{primitive.E{Key: "org_id", Value: 1},
-			primitive.E{Key: "app_id", Value: 1}},
+		bson.D{
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+		},
 		false)
 	if err != nil {
 		return err
@@ -199,9 +253,9 @@ func (m *database) applyRingsChecks(entries *collectionWrapper) error {
 		return err
 	}
 
-	//Add user_id index
+	//Add history.id index
 	err = entries.AddIndex(
-		bson.D{primitive.E{Key: "user_id", Value: 1}},
+		bson.D{primitive.E{Key: "history.id", Value: 1}},
 		false)
 	if err != nil {
 		return err
@@ -216,8 +270,25 @@ func (m *database) applyRingsRecordsChecks(entries *collectionWrapper) error {
 
 	//Add org_id + app_id index
 	err := entries.AddIndex(
-		bson.D{primitive.E{Key: "org_id", Value: 1},
-			primitive.E{Key: "app_id", Value: 1}},
+		bson.D{
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+			primitive.E{Key: "ring_id", Value: 1},
+		},
+		false)
+	if err != nil {
+		return err
+	}
+
+	err = entries.AddIndex(
+		bson.D{
+			primitive.E{Key: "date_created", Value: 1},
+			primitive.E{Key: "org_id", Value: 1},
+			primitive.E{Key: "app_id", Value: 1},
+			primitive.E{Key: "user_id", Value: 1},
+			primitive.E{Key: "ring_id", Value: 1},
+		},
 		false)
 	if err != nil {
 		return err
@@ -231,17 +302,17 @@ func (m *database) applyRingsRecordsChecks(entries *collectionWrapper) error {
 		return err
 	}
 
-	//Add user_id index
-	err = entries.AddIndex(
-		bson.D{primitive.E{Key: "user_id", Value: 1}},
-		false)
-	if err != nil {
-		return err
-	}
-
-	//Add user_id index
+	//Add ring_id index
 	err = entries.AddIndex(
 		bson.D{primitive.E{Key: "ring_id", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+
+	//Add date_created index
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "date_created", Value: -1}},
 		false)
 	if err != nil {
 		return err
