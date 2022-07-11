@@ -456,7 +456,7 @@ func (sa *Adapter) CreateRing(appID string, orgID string, userID string, ring *m
 	ring.UserID = userID
 	ring.DateCreated = time.Now().UTC()
 
-	for index, _ := range ring.History {
+	for index := range ring.History {
 		ring.History[index].RingID = ring.ID
 	}
 
@@ -588,12 +588,15 @@ func (sa *Adapter) DeleteRingHistory(appID string, orgID string, userID string, 
 }
 
 // GetRingsRecords Get all ring records for the corresponding ring id
-func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
+func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "ring_id", Value: ringID},
+	}
+
+	if ringID != nil {
+		filter = append(filter, primitive.E{Key: "ring_id", Value: ringID})
 	}
 
 	if startDateEpoch != nil {
@@ -664,7 +667,7 @@ func (sa *Adapter) CreateRingsRecord(appID string, orgID string, userID string, 
 		return nil, err
 	}
 
-	return sa.GetRingsRecord(appID, orgID, userID, record.RingID)
+	return sa.GetRingsRecord(appID, orgID, userID, record.ID)
 }
 
 // UpdateRingsRecord updates a ring record
@@ -689,7 +692,7 @@ func (sa *Adapter) UpdateRingsRecord(appID string, orgID string, userID string, 
 		return nil, fmt.Errorf("error delete a ring record: %s", err)
 	}
 
-	return sa.GetRingsRecord(appID, orgID, userID, record.RingID)
+	return sa.GetRingsRecord(appID, orgID, userID, record.ID)
 }
 
 // DeleteRingsRecord deletes a ring record

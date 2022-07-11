@@ -148,7 +148,7 @@ func (app *Application) deleteRingHistory(appID string, orgID string, userID str
 	return app.storage.DeleteRingHistory(appID, orgID, userID, ringID, ringHistoryID)
 }
 
-func (app *Application) getRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
+func (app *Application) getRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
 	return app.storage.GetRingsRecords(appID, orgID, userID, ringID, startDateEpoch, endDateEpoch, offset, limit, order)
 }
 

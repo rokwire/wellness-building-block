@@ -109,6 +109,7 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/user/rings/{id}/history/{history-id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRingHistoryEntry, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
 	// handle user wellness rings records apis
+	subRouter.HandleFunc("/user/all_rings_records", we.coreAuthWrapFunc(we.apisHandler.GetUserAllRingRecords, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/rings/{id}/records", we.coreAuthWrapFunc(we.apisHandler.GetUserRingRecords, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.GetUserGetUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/rings/{id}/records", we.coreAuthWrapFunc(we.apisHandler.CreateUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("POST")

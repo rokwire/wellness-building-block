@@ -48,7 +48,7 @@ type Services interface {
 	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
 	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
 
-	GetRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
+	GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
 	GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error)
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
@@ -135,7 +135,7 @@ func (s *servicesImpl) DeleteRingHistory(appID string, orgID string, userID stri
 	return s.app.deleteRingHistory(appID, orgID, userID, ringID, ringHistoryID)
 }
 
-func (s *servicesImpl) GetRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
+func (s *servicesImpl) GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
 	return s.app.getRingsRecords(appID, orgID, userID, ringID, startDateEpoch, endDateEpoch, offset, limit, order)
 }
 
@@ -179,7 +179,7 @@ type Storage interface {
 	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
 	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
 
-	GetRingsRecords(appID string, orgID string, userID string, ringID string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
+	GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
 	GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error)
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)

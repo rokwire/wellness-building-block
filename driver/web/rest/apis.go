@@ -706,8 +706,50 @@ func (h ApisHandler) DeleteUserRingHistoryEntry(claims *tokenauth.Claims, w http
 	w.WriteHeader(http.StatusOK)
 }
 
-// GetUserRingRecords Retrieves all user ring record
+// GetUserAllRingRecords Retrieves all user ring record
 // @Description Retrieves all user ring record
+// @Tags Client-RingsRecords
+// @ID GetUserAllRingRecords
+// @Param offset query string false "offset"
+// @Param limit query string false "limit - limit the result"
+// @Param order query string false "order - Possible values: asc, desc. Default: desc"
+// @Param start_date query string false "start_date - Start date filter in milliseconds as an integer epoch value"
+// @Param end_date query string false "end_date - End date filter in milliseconds as an integer epoch value"
+// @Success 200 {array} model.RingRecord
+// @Security UserAuth
+// @Router  /api/user/all_rings_records [get]
+func (h ApisHandler) GetUserAllRingRecords(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	offsetFilter := getInt64QueryParam(r, "offset")
+	limitFilter := getInt64QueryParam(r, "limit")
+	orderFilter := getStringQueryParam(r, "order")
+	startDateFilter := getInt64QueryParam(r, "start_date")
+	endDateFilter := getInt64QueryParam(r, "end_date")
+
+	resData, err := h.app.Services.GetRingsRecords(claims.AppID, claims.OrgID, claims.Subject, nil, startDateFilter, endDateFilter, offsetFilter, limitFilter, orderFilter)
+	if err != nil {
+		log.Printf("Error on getting user ring records- %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if resData == nil {
+		resData = []model.RingRecord{}
+	}
+
+	data, err := json.Marshal(resData)
+	if err != nil {
+		log.Printf("Error on marshal all user ring records: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+// GetUserRingRecords Retrieves all user ring record for a ring id
+// @Description Retrieves all user ring record for a ring id
 // @Tags Client-RingsRecords
 // @ID GetUserRingRecords
 // @Param offset query string false "offset"
@@ -727,7 +769,7 @@ func (h ApisHandler) GetUserRingRecords(claims *tokenauth.Claims, w http.Respons
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resData, err := h.app.Services.GetRingsRecords(claims.AppID, claims.OrgID, claims.Subject, id, startDateFilter, endDateFilter, offsetFilter, limitFilter, orderFilter)
+	resData, err := h.app.Services.GetRingsRecords(claims.AppID, claims.OrgID, claims.Subject, &id, startDateFilter, endDateFilter, offsetFilter, limitFilter, orderFilter)
 	if err != nil {
 		log.Printf("Error on getting user ring records- %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -891,9 +933,7 @@ func (h ApisHandler) CreateUserRingRecord(claims *tokenauth.Claims, w http.Respo
 	}
 
 	if item.RingID == "" {
-		log.Printf("api.CreateUserRingRecord() - missing ring_id\n")
-		http.Error(w, "api.CreateUserRingRecord() - missing ring_id", http.StatusBadRequest)
-		return
+		item.RingID = id
 	}
 
 	if item.RingID != id {

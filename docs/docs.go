@@ -20,6 +20,63 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/user/all_rings_records": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Retrieves all user ring record",
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "GetUserAllRingRecords",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit - limit the result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order - Possible values: asc, desc. Default: desc",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "start_date - Start date filter in milliseconds as an integer epoch value",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "end_date - End date filter in milliseconds as an integer epoch value",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RingRecord"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/user/rings": {
             "get": {
                 "security": [
@@ -193,7 +250,7 @@ const docTemplate = `{
                         "UserAuth": []
                     }
                 ],
-                "description": "Retrieves all user ring record",
+                "description": "Retrieves all user ring record for a ring id",
                 "tags": [
                     "Client-RingsRecords"
                 ],
@@ -775,6 +832,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "ring_id": {
                     "type": "string"
                 },
                 "unit": {

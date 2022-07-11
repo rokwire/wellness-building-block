@@ -46,6 +46,8 @@ definitions:
         type: string
       name:
         type: string
+      ring_id:
+        type: string
       unit:
         type: string
       value:
@@ -154,6 +156,44 @@ info:
   title: Rokwire Wellness Building Block API
   version: 1.0.1
 paths:
+  /api/user/all_rings_records:
+    get:
+      description: Retrieves all user ring record
+      operationId: GetUserAllRingRecords
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: 'order - Possible values: asc, desc. Default: desc'
+        in: query
+        name: order
+        type: string
+      - description: start_date - Start date filter in milliseconds as an integer
+          epoch value
+        in: query
+        name: start_date
+        type: string
+      - description: end_date - End date filter in milliseconds as an integer epoch
+          value
+        in: query
+        name: end_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
   /api/user/rings:
     get:
       consumes:
@@ -258,7 +298,7 @@ paths:
       - Client-Rings
   /api/user/rings/{id}/records:
     get:
-      description: Retrieves all user ring record
+      description: Retrieves all user ring record for a ring id
       operationId: GetUserRingRecords
       parameters:
       - description: offset
