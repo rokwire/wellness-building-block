@@ -154,7 +154,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Rokwire Wellness Building Block API
-  version: 1.0.1
+  version: 1.0.2
 paths:
   /api/user/all_rings_records:
     delete:
