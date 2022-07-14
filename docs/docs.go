@@ -75,6 +75,23 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes all user ring records (no matter of ring_id)",
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "DeleteAllUserRingRecords",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
             }
         },
         "/api/user/rings": {
@@ -333,6 +350,23 @@ const docTemplate = `{
                                 "$ref": "#/definitions/RingRecord"
                             }
                         }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Deletes all user ring record for a ring id",
+                "tags": [
+                    "Client-RingsRecords"
+                ],
+                "operationId": "DeleteUserRingRecords",
+                "responses": {
+                    "200": {
+                        "description": ""
                     }
                 }
             }

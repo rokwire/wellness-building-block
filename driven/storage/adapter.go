@@ -695,22 +695,25 @@ func (sa *Adapter) UpdateRingsRecord(appID string, orgID string, userID string, 
 	return sa.GetRingsRecord(appID, orgID, userID, record.ID)
 }
 
-// DeleteRingsRecord deletes a ring record
-func (sa *Adapter) DeleteRingsRecord(appID string, orgID string, userID string, ringID string, recordID string) error {
+// DeleteRingsRecords deletes a ring record
+func (sa *Adapter) DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error {
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "ring_id", Value: ringID},
-		primitive.E{Key: "_id", Value: recordID}}
-
-	res, err := sa.db.ringsRecords.DeleteOne(filter, nil)
-	if err != nil {
-		log.Printf("error delete a ring record: %s", err)
-		return fmt.Errorf("error delete a ring record: %s", err)
+	}
+	if ringID != nil {
+		filter = append(filter, primitive.E{Key: "ring_id", Value: *ringID})
+	}
+	if recordID != nil {
+		filter = append(filter, primitive.E{Key: "_id", Value: *recordID})
 	}
 
-	_ = res
+	_, err := sa.db.ringsRecords.DeleteMany(filter, nil)
+	if err != nil {
+		log.Printf("error delete a ring records: %s", err)
+		return fmt.Errorf("error delete a ring records: %s", err)
+	}
 
 	return nil
 }

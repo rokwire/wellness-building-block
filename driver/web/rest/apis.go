@@ -964,6 +964,47 @@ func (h ApisHandler) CreateUserRingRecord(claims *tokenauth.Claims, w http.Respo
 	w.Write(jsonData)
 }
 
+// DeleteAllUserRingRecords Deletes all user ring records (no matter of ring_id)
+// @Description Deletes all user ring records (no matter of ring_id)
+// @Tags Client-RingsRecords
+// @ID DeleteAllUserRingRecords
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/all_rings_records [delete]
+func (h ApisHandler) DeleteAllUserRingRecords(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	err := h.app.Services.DeleteRingsRecords(claims.AppID, claims.OrgID, claims.Subject, nil, nil)
+	if err != nil {
+		log.Printf("Error on deleting all user ring records - %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// DeleteUserRingRecords Deletes all user ring record for a ring id
+// @Description Deletes all user ring record for a ring id
+// @Tags Client-RingsRecords
+// @ID DeleteUserRingRecords
+// @Success 200
+// @Security UserAuth
+// @Router /api/user/rings/{id}/records [delete]
+func (h ApisHandler) DeleteUserRingRecords(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ringID := vars["id"]
+
+	err := h.app.Services.DeleteRingsRecords(claims.AppID, claims.OrgID, claims.Subject, &ringID, nil)
+	if err != nil {
+		log.Printf("Error on deleting user ring records with ring_id - %s\n %s", ringID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+}
+
 // DeleteUserRingRecord Deletes a user ring record with the specified id
 // @Description Deletes a user ring record with the specified id
 // @Tags Client-RingsRecords
@@ -976,7 +1017,7 @@ func (h ApisHandler) DeleteUserRingRecord(claims *tokenauth.Claims, w http.Respo
 	ringID := vars["id"]
 	recordID := vars["record-id"]
 
-	err := h.app.Services.DeleteRingsRecord(claims.AppID, claims.OrgID, claims.Subject, ringID, recordID)
+	err := h.app.Services.DeleteRingsRecords(claims.AppID, claims.OrgID, claims.Subject, &ringID, &recordID)
 	if err != nil {
 		log.Printf("Error on deleting user ring record with id - %s\n %s", recordID, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

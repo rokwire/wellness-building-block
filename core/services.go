@@ -164,6 +164,6 @@ func (app *Application) updateRingsRecord(appID string, orgID string, userID str
 	return app.storage.UpdateRingsRecord(appID, orgID, userID, record)
 }
 
-func (app *Application) deleteRingsRecord(appID string, orgID string, userID string, ringID string, recordID string) error {
-	return app.storage.DeleteRingsRecord(appID, orgID, userID, ringID, recordID)
+func (app *Application) deleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error {
+	return app.storage.DeleteRingsRecords(appID, orgID, userID, ringID, recordID)
 }

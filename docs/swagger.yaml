@@ -157,6 +157,16 @@ info:
   version: 1.0.1
 paths:
   /api/user/all_rings_records:
+    delete:
+      description: Deletes all user ring records (no matter of ring_id)
+      operationId: DeleteAllUserRingRecords
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
     get:
       description: Retrieves all user ring record
       operationId: GetUserAllRingRecords
@@ -297,6 +307,16 @@ paths:
       tags:
       - Client-Rings
   /api/user/rings/{id}/records:
+    delete:
+      description: Deletes all user ring record for a ring id
+      operationId: DeleteUserRingRecords
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
     get:
       description: Retrieves all user ring record for a ring id
       operationId: GetUserRingRecords

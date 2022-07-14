@@ -110,9 +110,11 @@ func (we Adapter) Start() {
 
 	// handle user wellness rings records apis
 	subRouter.HandleFunc("/user/all_rings_records", we.coreAuthWrapFunc(we.apisHandler.GetUserAllRingRecords, we.auth.coreAuth.standardAuth)).Methods("GET")
+	subRouter.HandleFunc("/user/all_rings_records", we.coreAuthWrapFunc(we.apisHandler.DeleteAllUserRingRecords, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 	subRouter.HandleFunc("/user/rings/{id}/records", we.coreAuthWrapFunc(we.apisHandler.GetUserRingRecords, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.GetUserGetUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/rings/{id}/records", we.coreAuthWrapFunc(we.apisHandler.CreateUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("POST")
+	subRouter.HandleFunc("/user/rings/{id}/records", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRingRecords, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("PUT")
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
