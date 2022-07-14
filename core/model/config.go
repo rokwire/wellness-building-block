@@ -2,6 +2,7 @@ package model
 
 // Config the main config structure
 type Config struct {
-	CoreBBHost string
-	ServiceURL string
+	InternalAPIKey string
+	CoreBBHost     string
+	ServiceURL     string
 }
