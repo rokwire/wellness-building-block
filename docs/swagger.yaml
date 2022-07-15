@@ -1,4 +1,151 @@
 basePath: /wellness
+definitions:
+  CategoryRef:
+    properties:
+      app_id:
+        type: string
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      org_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  Ring:
+    properties:
+      app_id:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      history:
+        items:
+          $ref: '#/definitions/RingHistoryEntry'
+        type: array
+      id:
+        type: string
+      org_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  RingHistoryEntry:
+    properties:
+      color_hex:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      ring_id:
+        type: string
+      unit:
+        type: string
+      value:
+        type: number
+    type: object
+  RingRecord:
+    properties:
+      app_id:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      org_id:
+        type: string
+      ring_id:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: number
+    type: object
+  TodoCategory:
+    properties:
+      app_id:
+        type: string
+      color:
+        type: string
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      org_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  TodoEntry:
+    properties:
+      app_id:
+        type: string
+      category:
+        $ref: '#/definitions/CategoryRef'
+      completed:
+        type: boolean
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      description:
+        type: string
+      due_date_time:
+        type: string
+      has_due_time:
+        type: boolean
+      id:
+        type: string
+      location:
+        type: string
+      org_id:
+        type: string
+      reminder_date_time:
+        type: string
+      reminder_type:
+        type: string
+      title:
+        type: string
+      user_id:
+        type: string
+      work_days:
+        items:
+          type: string
+        type: array
+    type: object
+  createUserRingRecordRequestBody:
+    properties:
+      ring_id:
+        type: string
+      value:
+        type: number
+    type: object
+  createUserRingRequestBody:
+    properties:
+      color_hex:
+        type: string
+      name:
+        type: string
+      unit:
+        type: string
+      value:
+        type: number
+    type: object
 host: localhost
 info:
   contact: {}
@@ -7,38 +154,319 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Rokwire Wellness Building Block API
-  version: 1.2.0
+  version: 1.0.2
 paths:
-  /user/todo_categories:
+  /api/user/all_rings_records:
+    delete:
+      description: Deletes all user ring records (no matter of ring_id)
+      operationId: DeleteAllUserRingRecords
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+    get:
+      description: Retrieves all user ring record
+      operationId: GetUserAllRingRecords
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: 'order - Possible values: asc, desc. Default: desc'
+        in: query
+        name: order
+        type: string
+      - description: start_date - Start date filter in milliseconds as an integer
+          epoch value
+        in: query
+        name: start_date
+        type: string
+      - description: end_date - End date filter in milliseconds as an integer epoch
+          value
+        in: query
+        name: end_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+  /api/user/rings:
     get:
       consumes:
       - application/json
-      deprecated: true
+      description: Retrieves all user wellness ring entries
+      operationId: GetUserRings
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Ring'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+    post:
+      consumes:
+      - application/json
+      description: Creates a user wellness ring entry
+      operationId: CreateUserRing
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Ring'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Ring'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+  /api/user/rings/{id}:
+    delete:
+      description: Deletes a user wellness ring entry with the specified id
+      operationId: DeleteUserRing
+      responses: {}
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user wellness ring entry by id
+      operationId: GetUserRing
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Ring'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Ring'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+  /api/user/rings/{id}/history:
+    post:
+      consumes:
+      - application/json
+      description: Creates a user wellness ring history entry
+      operationId: CreateUserRingHistoryEntry
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/createUserRingRequestBody'
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+  /api/user/rings/{id}/history/{history-id}:
+    delete:
+      description: Deletes a user wellness ring history entry with the specified id
+        & history id
+      operationId: DeleteUserRingHistoryEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-Rings
+  /api/user/rings/{id}/records:
+    delete:
+      description: Deletes all user ring record for a ring id
+      operationId: DeleteUserRingRecords
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+    get:
+      description: Retrieves all user ring record for a ring id
+      operationId: GetUserRingRecords
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: string
+      - description: limit - limit the result
+        in: query
+        name: limit
+        type: string
+      - description: 'order - Possible values: asc, desc. Default: desc'
+        in: query
+        name: order
+        type: string
+      - description: start_date - Start date filter in milliseconds as an integer
+          epoch value
+        in: query
+        name: start_date
+        type: string
+      - description: end_date - End date filter in milliseconds as an integer epoch
+          value
+        in: query
+        name: end_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+    post:
+      consumes:
+      - application/json
+      description: Creates a user ring record
+      operationId: CreateUserRingRecord
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/createUserRingRecordRequestBody'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+  /api/user/rings/{id}/records/{record-id}:
+    delete:
+      description: Deletes a user ring record with the specified id
+      operationId: DeleteUserRingRecord
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+    get:
+      description: Retrieves a user ring record by id
+      operationId: GetUserGetUserRingRecord
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+    put:
+      consumes:
+      - application/json
+      description: Updates a user ring record with the specified id
+      operationId: UpdateUserRingRecord
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/RingRecord'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RingRecord'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-RingsRecords
+  /api/user/todo_categories:
+    get:
+      consumes:
+      - application/json
       description: Retrieves all user todo categories
       operationId: GetUserTodoCategories
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/TodoCategory'
+            type: array
       security:
       - UserAuth: []
       tags:
-      - Client
+      - Client-TodoCategories
     post:
-      consumes:
-      - application/json
-      deprecated: true
       description: Creates a user todo category
       operationId: CreateUserTodoCategory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TodoCategory'
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoCategory'
       security:
       - UserAuth: []
       tags:
-      - Client
-  /user/todo_categories/{id}:
+      - Client-TodoCategories
+  /api/user/todo_categories/{id}:
     delete:
-      deprecated: true
       description: Deletes a user todo category with the specified id
       operationId: DeleteUserTodoCategory
       responses:
@@ -47,7 +475,7 @@ paths:
       security:
       - UserAuth: []
       tags:
-      - client
+      - Client-TodoCategories
     get:
       consumes:
       - application/json
@@ -57,25 +485,146 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoCategory'
       security:
       - UserAuth: []
       tags:
-      - Client
+      - Client-TodoCategories
     put:
       consumes:
       - application/json
       description: Updates a user todo category with the specified id
       operationId: UpdateUserTodoCategory
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TodoCategory'
       produces:
       - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoCategory'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoCategories
+  /api/user/todo_entries:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all user todo entries
+      operationId: GetUserTodoEntries
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/TodoEntry'
+            type: array
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoEntries
+    post:
+      consumes:
+      - application/json
+      description: Creates a user todo entry
+      operationId: CreateUserTodoEntry
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TodoEntry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoEntry'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoEntries
+  /api/user/todo_entries/{id}:
+    delete:
+      description: Deletes a user todo entry with the specified id
+      operationId: DeleteUserTodoEntry
       responses:
         "200":
           description: ""
       security:
       - UserAuth: []
       tags:
-      - Client
+      - Client-TodoEntries
+    get:
+      description: Retrieves a user todo entry by id
+      operationId: GetUserTodoEntry
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoEntry'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoEntries
+    put:
+      consumes:
+      - application/json
+      description: Updates a user todo entry with the specified id
+      operationId: UpdateUserTodoEntry
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TodoEntry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TodoEntry'
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoEntries
+  /api/user/todo_entries/clear_completed_entries:
+    delete:
+      description: Deletes all completed user todo entries
+      operationId: DeleteCompletedUserTodoEntry
+      responses:
+        "200":
+          description: ""
+      security:
+      - UserAuth: []
+      tags:
+      - Client-TodoEntries
+  /int/process_reminders:
+    post:
+      description: Process reminders. Invoked by AWS Scheduler API
+      operationId: ProcessReminders
+      responses:
+        "200":
+          description: ""
+      security:
+      - InternalAPIAuth: []
+      tags:
+      - Internal
   /version:
     get:
       description: Gives the service version.
@@ -98,9 +647,9 @@ securityDefinitions:
     in: header (add Bearer prefix to the Authorization value)
     name: Authorization
     type: apiKey
-  RokwireAuth:
-    in: header
-    name: ROKWIRE-API-KEY
+  InternalAPIAuth:
+    in: header (add INTERNAL-API-KEY header with an appropriate value)
+    name: Authorization
     type: apiKey
   UserAuth:
     in: header (add Bearer prefix to the Authorization value)

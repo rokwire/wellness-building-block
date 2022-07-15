@@ -16,7 +16,6 @@ package core
 
 import (
 	"sync"
-	cacheadapter "wellness/driven/cache"
 )
 
 //Application represents the core application code based on hexagonal architecture
@@ -28,8 +27,8 @@ type Application struct {
 
 	Services Services //expose to the drivers adapters
 
-	cache   *cacheadapter.CacheAdapter
-	storage Storage
+	storage       Storage
+	notifications Notifications
 
 	//TODO - remove this when applied to all environemnts
 	multiTenancyAppID string
@@ -42,11 +41,10 @@ func (app *Application) Start() {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage,
-	cacheadapter *cacheadapter.CacheAdapter, mtAppID string, mtOrgID string) *Application {
+func NewApplication(version string, build string, storage Storage, notifications Notifications, mtAppID string, mtOrgID string) *Application {
 	cacheLock := &sync.Mutex{}
 	application := Application{version: version, build: build, cacheLock: cacheLock, storage: storage,
-		cache: cacheadapter, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID}
+		notifications: notifications, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

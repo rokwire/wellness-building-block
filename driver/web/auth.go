@@ -15,6 +15,7 @@
 package web
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"wellness/core"
@@ -24,7 +25,6 @@ import (
 	"github.com/rokwire/core-auth-library-go/authservice"
 	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logs"
 	"github.com/rokwire/logging-library-go/logutils"
 )
 
@@ -36,14 +36,16 @@ type Authorization interface {
 
 // Auth handler
 type Auth struct {
-	coreAuth *CoreAuth
+	coreAuth     *CoreAuth
+	internalAuth *InternalAuth
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config) *Auth {
-	coreAuth := NewCoreAuth(app, config)
+func NewAuth(app *core.Application, config model.Config, authService *authservice.AuthService) *Auth {
+	coreAuth := NewCoreAuth(app, config, authService)
+	internalAuth := newInternalAuth(config.InternalAPIKey)
 
-	auth := Auth{coreAuth: coreAuth}
+	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth}
 	return &auth
 }
 
@@ -58,17 +60,7 @@ type CoreAuth struct {
 }
 
 // NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
-
-	remoteConfig := authservice.RemoteAuthDataLoaderConfig{
-		AuthServicesHost: config.CoreBBHost,
-	}
-
-	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core"}, logs.NewLogger("wellness", &logs.LoggerOpts{}))
-	authService, err := authservice.NewAuthService("wellness", config.ServiceURL, serviceLoader)
-	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
-	}
+func NewCoreAuth(app *core.Application, config model.Config, authService *authservice.AuthService) *CoreAuth {
 
 	adminPermissionAuth := authorization.NewCasbinAuthorization("driver/web/authorization_model.conf",
 		"driver/web/authorization_policy.csv")
@@ -162,4 +154,24 @@ func (a *StandardAuth) check(req *http.Request) (int, *tokenauth.Claims, error) 
 func newStandardAuth(tokenAuth *tokenauth.TokenAuth) *StandardAuth {
 	standartAuth := StandardAuth{tokenAuth: tokenAuth}
 	return &standartAuth
+}
+
+//InternalAuth entity
+// This enforces Internal API Key auth check
+type InternalAuth struct {
+	internalAPIKey string
+}
+
+func (a *InternalAuth) check(req *http.Request) (int, error) {
+	internalAPIKey := req.Header.Get("INTERNAL-API-KEY")
+	if internalAPIKey != a.internalAPIKey {
+		return http.StatusUnauthorized, errors.WrapErrorAction("typeCheckServicesInternalAPIKey", logutils.TypeRequest, nil, fmt.Errorf("wrong or missing INTERNAL-API-KEY request header"))
+	}
+
+	return http.StatusOK, nil
+}
+
+func newInternalAuth(internalAPIKey string) *InternalAuth {
+	auth := InternalAuth{internalAPIKey: internalAPIKey}
+	return &auth
 }

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/wellness-building-block/issues/2)
 
+## [1.0.2] - 2022-07-14
+### Added
+- Introduce basic APIs for todos, todos categories and wellness rings [#1](https://github.com/rokwire/wellness-building-block/issues/1)
+
 ## [1.0.1] - 2022-06-21
 ### Added
 - Introduce basic APIs for todos, todos categories and wellness rings [#1](https://github.com/rokwire/wellness-building-block/issues/1)

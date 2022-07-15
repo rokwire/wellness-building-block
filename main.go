@@ -32,12 +32,14 @@
 package main
 
 import (
+	"github.com/rokwire/core-auth-library-go/authservice"
+	"github.com/rokwire/logging-library-go/logs"
 	"log"
 	"os"
 	"strings"
 	"wellness/core"
 	"wellness/core/model"
-	cacheadapter "wellness/driven/cache"
+	"wellness/driven/notifications"
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
 )
@@ -56,6 +58,13 @@ func main() {
 
 	port := getEnvKey("PORT", true)
 
+	internalAPIKey := getEnvKey("INTERNAL_API_KEY", true)
+
+	// web adapter
+	host := getEnvKey("WELLNESS_HOST", true)
+	coreBBHost := getEnvKey("WELLNESS_CORE_BB_HOST", true)
+	serviceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
+
 	//mongoDB adapter
 	mongoDBAuth := getEnvKey("WELLNESS_MONGO_AUTH", true)
 	mongoDBName := getEnvKey("WELLNESS_MONGO_DATABASE", true)
@@ -66,27 +75,40 @@ func main() {
 		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
 	}
 
-	defaultCacheExpirationSeconds := getEnvKey("WELLNESS_DEFAULT_CACHE_EXPIRATION_SECONDS", false)
-	cacheAdapter := cacheadapter.NewCacheAdapter(defaultCacheExpirationSeconds)
-
 	mtAppID := getEnvKey("WELLNESS_MULTI_TENANCY_APP_ID", true)
 	mtOrgID := getEnvKey("WELLNESS_MULTI_TENANCY_ORG_ID", true)
 
-	// application
-	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter, mtAppID, mtOrgID)
-	application.Start()
-
-	// web adapter
-	host := getEnvKey("WELLNESS_HOST", true)
-	coreBBHost := getEnvKey("WELLNESS_CORE_BB_HOST", true)
-	serviceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
-
-	config := model.Config{
-		CoreBBHost: coreBBHost,
-		ServiceURL: serviceURL,
+	remoteConfig := authservice.RemoteAuthDataLoaderConfig{
+		AuthServicesHost: coreBBHost,
+	}
+	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core", "notifications"}, logs.NewLogger("wellness", &logs.LoggerOpts{}))
+	if err != nil {
+		log.Fatalf("Error initializing auth service: %v", err)
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config)
+	authService, err := authservice.NewAuthService("wellness", serviceURL, serviceLoader)
+	if err != nil {
+		log.Fatalf("Error initializing auth service: %v", err)
+	}
+
+	// Notifications service reg
+	notificationsServiceReg, err := authService.GetServiceReg("notifications")
+	if err != nil {
+		log.Fatalf("error finding notifications service reg: %s", err)
+	}
+	notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host)
+
+	// application
+	application := core.NewApplication(Version, Build, storageAdapter, notificationsAdapter, mtAppID, mtOrgID)
+	application.Start()
+
+	config := model.Config{
+		CoreBBHost:     coreBBHost,
+		ServiceURL:     serviceURL,
+		InternalAPIKey: internalAPIKey,
+	}
+
+	webAdapter := driver.NewWebAdapter(host, port, application, config, authService)
 
 	webAdapter.Start()
 }
