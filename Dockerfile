@@ -8,8 +8,7 @@ WORKDIR /wellness-app
 COPY . .
 RUN make
 
-FROM alpine:3.15
-
+FROM alpine:3.16.2
 
 COPY --from=builder /wellness-app/bin/wellness /
 COPY --from=builder /wellness-app/docs/swagger.yaml /docs/swagger.yaml

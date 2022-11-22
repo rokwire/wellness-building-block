@@ -29,7 +29,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-//Adapter entity
+// Adapter entity
 type Adapter struct {
 	host string
 	port string
@@ -67,7 +67,7 @@ type Adapter struct {
 // @in header
 // @name GROUP
 
-//Start starts the module
+// Start starts the module
 func (we Adapter) Start() {
 
 	router := mux.NewRouter().StrictSlash(true)

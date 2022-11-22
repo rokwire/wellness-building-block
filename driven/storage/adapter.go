@@ -42,7 +42,7 @@ func (sa *Adapter) Start() error {
 	return err
 }
 
-//PerformTransaction performs a transaction
+// PerformTransaction performs a transaction
 func (sa *Adapter) PerformTransaction(transaction func(context TransactionContext) error) error {
 	// transaction
 	err := sa.db.dbClient.UseSession(context.Background(), func(sessionContext mongo.SessionContext) error {
@@ -735,7 +735,7 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 	return &Adapter{db: db}
 }
 
-//TransactionContext wraps mongo.SessionContext for use by external packages
+// TransactionContext wraps mongo.SessionContext for use by external packages
 type TransactionContext interface {
 	mongo.SessionContext
 }
