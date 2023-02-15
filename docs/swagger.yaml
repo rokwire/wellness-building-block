@@ -119,6 +119,8 @@ definitions:
         type: string
       reminder_type:
         type: string
+      task_time:
+        type: string
       title:
         type: string
       user_id:
@@ -614,17 +616,6 @@ paths:
       - UserAuth: []
       tags:
       - Client-TodoEntries
-  /int/process_reminders:
-    post:
-      description: Process reminders. Invoked by AWS Scheduler API
-      operationId: ProcessReminders
-      responses:
-        "200":
-          description: ""
-      security:
-      - InternalAPIAuth: []
-      tags:
-      - Internal
   /version:
     get:
       description: Gives the service version.

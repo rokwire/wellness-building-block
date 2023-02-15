@@ -52,6 +52,7 @@ type TodoEntry struct {
 	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
 	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
 	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
+	TaskTime         *time.Time   `json:"task_time" bson:"task_time"`
 	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
 	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
 } // @name TodoEntry

@@ -16,13 +16,14 @@ package web
 
 import (
 	"fmt"
-	"github.com/rokwire/core-auth-library-go/authservice"
 	"log"
 	"net/http"
 	"wellness/core"
 	"wellness/core/model"
 	"wellness/driver/web/rest"
 	"wellness/utils"
+
+	"github.com/rokwire/core-auth-library-go/authservice"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/tokenauth"
@@ -79,8 +80,6 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
 	subRouter = subRouter.PathPrefix("/api").Subrouter()
-
-	subRouter.HandleFunc("/int/process_reminders", we.internalAuthWrapFunc(we.internalApisHandler.ProcessReminders)).Methods("POST")
 
 	// handle user todo categories apis
 	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.standardAuth)).Methods("GET")

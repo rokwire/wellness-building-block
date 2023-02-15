@@ -17,6 +17,7 @@ package core
 import (
 	"time"
 	"wellness/core/model"
+	"wellness/driven/storage"
 )
 
 // Services exposes APIs for the driver adapters
@@ -35,8 +36,6 @@ type Services interface {
 	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
-
-	ProcessReminders() error
 
 	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
 	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)
@@ -104,10 +103,6 @@ func (s *servicesImpl) DeleteCompletedTodoEntries(appID string, orgID string, us
 	return s.app.deleteCompletedTodoEntries(appID, orgID, userID)
 }
 
-func (s *servicesImpl) ProcessReminders() error {
-	return s.app.processReminders()
-}
-
 func (s *servicesImpl) GetRings(appID string, orgID string, userID string) ([]model.Ring, error) {
 	return s.app.getRings(appID, orgID, userID)
 }
@@ -154,18 +149,21 @@ func (s *servicesImpl) DeleteRingsRecords(appID string, orgID string, userID str
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
+	PerformTransaction(transaction func(context storage.TransactionContext) error) error
+
 	GetTodoCategories(appID string, orgID string, userID string) ([]model.TodoCategory, error)
 	GetTodoCategory(appID string, orgID string, userID string, id string) (*model.TodoCategory, error)
 	CreateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	DeleteTodoCategory(appID string, orgID string, userID string, id string) error
 
-	GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time) ([]model.TodoEntry, error)
-	GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.TodoEntry, error)
+	GetTodoEntriesWithCurrentReminderTime(context storage.TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error)
+	GetTodoEntriesWithCurrentDueTime(context storage.TransactionContext, dueTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
+	UpdateTodoEntriesTaskTime(context storage.TransactionContext, ids []string, taskTime time.Time) error
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
 
