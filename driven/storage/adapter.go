@@ -423,6 +423,7 @@ func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(context TransactionContext, 
 	return result, nil
 }
 
+// UpdateTodoEntriesTaskTime Updates task time field for the desired todo ids
 func (sa *Adapter) UpdateTodoEntriesTaskTime(context TransactionContext, ids []string, taskTime time.Time) error {
 	if len(ids) > 0 {
 		filter := bson.D{
