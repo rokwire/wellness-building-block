@@ -2,13 +2,15 @@ package model
 
 // NotificationMessage wrapper for internal message
 type NotificationMessage struct {
+	OrgID      string                  `json:"org_id" bson:"org_id"`
+	AppID      string                  `json:"app_id" bson:"app_id"`
 	Priority   int                     `json:"priority" bson:"priority"`
 	Recipients []NotificationRecipient `json:"recipients" bson:"recipients"`
-	Topic      *string                 `json:"topic" bson:"topic"`
-	Subject    string                  `json:"subject" bson:"subject"`
-	Sender     *NotificationSender     `json:"sender,omitempty" bson:"sender,omitempty"`
-	Body       string                  `json:"body" bson:"body"`
-	Data       map[string]string       `json:"data" bson:"data"`
+	//Topic      *string                 `json:"topic" bson:"topic"`
+	Subject string              `json:"subject" bson:"subject"`
+	Sender  *NotificationSender `json:"sender,omitempty" bson:"sender,omitempty"`
+	Body    string              `json:"body" bson:"body"`
+	Data    map[string]string   `json:"data" bson:"data"`
 }
 
 // NotificationRecipient recipients wrapper struct

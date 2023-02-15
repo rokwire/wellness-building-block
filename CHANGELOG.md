@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fix broken appointment notifications [#7](https://github.com/rokwire/wellness-building-block/issues/7)
+
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/wellness-building-block/issues/2)
 
