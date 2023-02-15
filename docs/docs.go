@@ -760,25 +760,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/int/process_reminders": {
-            "post": {
-                "security": [
-                    {
-                        "InternalAPIAuth": []
-                    }
-                ],
-                "description": "Process reminders. Invoked by AWS Scheduler API",
-                "tags": [
-                    "Internal"
-                ],
-                "operationId": "ProcessReminders",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/version": {
             "get": {
                 "description": "Gives the service version.",
@@ -977,6 +958,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "reminder_type": {
+                    "type": "string"
+                },
+                "task_time": {
                     "type": "string"
                 },
                 "title": {

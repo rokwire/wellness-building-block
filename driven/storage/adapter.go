@@ -17,14 +17,15 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"strconv"
 	"time"
 	"wellness/core/model"
+
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/rokwire/logging-library-go/errors"
 	"github.com/rokwire/logging-library-go/logutils"
@@ -318,6 +319,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
+			primitive.E{Key: "task_time", Value: todo.TaskTime},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
@@ -365,7 +367,7 @@ func (sa *Adapter) DeleteCompletedTodoEntries(appID string, orgID string, userID
 }
 
 // GetTodoEntriesWithCurrentReminderTime Gets all todo entries that are applied for the specified reminder datetime
-func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time) ([]model.TodoEntry, error) {
+func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(context TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error) {
 	startDate := time.Date(reminderTime.Year(), reminderTime.Month(), reminderTime.Day(), reminderTime.Hour(), reminderTime.Minute(), 0, 0, reminderTime.Location())
 	endDate := time.Date(reminderTime.Year(), reminderTime.Month(), reminderTime.Day(), reminderTime.Hour(), reminderTime.Minute(), 59, 999999, reminderTime.Location())
 	filter := bson.D{
@@ -374,10 +376,20 @@ func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time)
 			{Key: "$gte", Value: startDate},
 			{Key: "$lte", Value: endDate},
 		}},
+		primitive.E{Key: "$or", Value: []primitive.M{
+			{"task_time": primitive.M{"$exists": false}},
+			{"task_time": nil},
+			{"task_time": primitive.M{"$lt": startDate}},
+		}},
+	}
+	update := bson.D{
+		bson.E{Key: "$set", Value: bson.D{
+			bson.E{Key: "task_time", Value: reminderTime},
+		}},
 	}
 
 	var result []model.TodoEntry
-	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	err := sa.db.todoEntries.FindOneAndUpdateWithContext(context, filter, update, &result, &options.FindOneAndUpdateOptions{Sort: bson.D{{"name", 1}}})
 	if err != nil {
 		return nil, err
 	}
@@ -385,7 +397,7 @@ func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(reminderTime time.Time)
 }
 
 // GetTodoEntriesWithCurrentDueTime Gets all todo entries that are applied for the specified due datetime
-func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.TodoEntry, error) {
+func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(context TransactionContext, dueTime time.Time) ([]model.TodoEntry, error) {
 	startDate := time.Date(dueTime.Year(), dueTime.Month(), dueTime.Day(), dueTime.Hour(), dueTime.Minute(), 0, 0, dueTime.Location())
 	endDate := time.Date(dueTime.Year(), dueTime.Month(), dueTime.Day(), dueTime.Hour(), dueTime.Minute(), 59, 999999, dueTime.Location())
 	filter := bson.D{
@@ -395,6 +407,11 @@ func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.
 			{Key: "$gte", Value: startDate},
 			{Key: "$lte", Value: endDate},
 		}},
+		primitive.E{Key: "$or", Value: []primitive.M{
+			{"task_time": primitive.M{"$exists": false}},
+			{"task_time": nil},
+			{"task_time": primitive.M{"$lt": startDate}},
+		}},
 	}
 
 	var result []model.TodoEntry
@@ -402,7 +419,25 @@ func (sa *Adapter) GetTodoEntriesWithCurrentDueTime(dueTime time.Time) ([]model.
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
+}
+
+// UpdateTodoEntriesTaskTime Updates task time field for the desired todo ids
+func (sa *Adapter) UpdateTodoEntriesTaskTime(context TransactionContext, ids []string, taskTime time.Time) error {
+	if len(ids) > 0 {
+		filter := bson.D{
+			bson.E{Key: "_id", Value: bson.M{"$in": ids}},
+		}
+		update := bson.D{
+			bson.E{Key: "$set", Value: bson.D{
+				bson.E{Key: "task_time", Value: taskTime},
+			}},
+		}
+		_, err := sa.db.todoEntries.UpdateManyWithContext(context, filter, update, &options.UpdateOptions{})
+		return err
+	}
+	return nil
 }
 
 // Wellness Rings

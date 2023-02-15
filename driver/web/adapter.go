@@ -81,8 +81,6 @@ func (we Adapter) Start() {
 
 	subRouter = subRouter.PathPrefix("/api").Subrouter()
 
-	subRouter.HandleFunc("/int/process_reminders", we.internalAuthWrapFunc(we.internalApisHandler.ProcessReminders)).Methods("POST")
-
 	// handle user todo categories apis
 	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.GetUserTodoCategories, we.auth.coreAuth.standardAuth)).Methods("GET")
 	subRouter.HandleFunc("/user/todo_categories", we.coreAuthWrapFunc(we.apisHandler.CreateUserTodoCategory, we.auth.coreAuth.standardAuth)).Methods("POST")

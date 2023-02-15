@@ -42,6 +42,10 @@ func (collWrapper *collectionWrapper) FindWithContext(ctx context.Context, filte
 func (collWrapper *collectionWrapper) FindWithParams(ctx context.Context, filter interface{}, result interface{},
 	findOptions *options.FindOptions, timeout *time.Duration) error {
 
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	//set timeout
 	if timeout == nil {
 		timeout = &collWrapper.database.mongoTimeout
@@ -215,6 +219,11 @@ func (collWrapper *collectionWrapper) UpdateMany(filter interface{}, update inte
 }
 
 func (collWrapper *collectionWrapper) UpdateManyWithContext(ctx context.Context, filter interface{}, update interface{}, opts *options.UpdateOptions) (*mongo.UpdateResult, error) {
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
 	defer cancel()
 
