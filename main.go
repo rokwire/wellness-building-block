@@ -32,8 +32,6 @@
 package main
 
 import (
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/logging-library-go/logs"
 	"log"
 	"os"
 	"strings"
@@ -42,6 +40,9 @@ import (
 	"wellness/driven/notifications"
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
+
+	"github.com/rokwire/core-auth-library-go/authservice"
+	"github.com/rokwire/logging-library-go/logs"
 )
 
 var (
@@ -96,7 +97,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error finding notifications service reg: %s", err)
 	}
-	notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host)
+	notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
 
 	// application
 	application := core.NewApplication(Version, Build, storageAdapter, notificationsAdapter, mtAppID, mtOrgID)
