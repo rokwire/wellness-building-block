@@ -11,13 +11,16 @@ import (
 
 // Adapter implements the Notifications interface
 type Adapter struct {
-	internalAPIKey string
-	baseURL        string
+	internalAPIKey    string
+	baseURL           string
+	multiTenancyAppID string
+	multiTenancyOrgID string
 }
 
 // NewNotificationsAdapter creates a new Notifications BB adapter instance
-func NewNotificationsAdapter(internalAPIKey, notificationsHost string) *Adapter {
-	return &Adapter{internalAPIKey: internalAPIKey, baseURL: notificationsHost}
+func NewNotificationsAdapter(internalAPIKey, notificationsHost string, mtAppID string, mtOrgID string) *Adapter {
+	return &Adapter{internalAPIKey: internalAPIKey, baseURL: notificationsHost, multiTenancyAppID: mtAppID,
+		multiTenancyOrgID: mtOrgID}
 }
 
 // SendNotification sends notification to a user
