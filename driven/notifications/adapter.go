@@ -24,17 +24,19 @@ func NewNotificationsAdapter(internalAPIKey, notificationsHost string, mtAppID s
 }
 
 // SendNotification sends notification to a user
-func (a *Adapter) SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, data map[string]string) error {
+func (a *Adapter) SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, data map[string]string) error {
 	if len(recipients) > 0 {
 		url := fmt.Sprintf("%s/api/int/message", a.baseURL)
 
 		bodyData := model.NotificationMessage{
-			Priority:   10,
-			Topic:      topic,
+			Priority: 10,
+			//	Topic:      topic,
 			Recipients: recipients,
 			Subject:    title,
 			Body:       text,
 			Data:       data,
+			AppID:      appID,
+			OrgID:      orgID,
 		}
 		bodyBytes, err := json.Marshal(bodyData)
 		if err != nil {

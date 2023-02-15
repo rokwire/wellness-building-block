@@ -77,16 +77,18 @@ func (app *Application) processReminders() error {
 	if err != nil {
 		log.Printf("Error on retrieving reminders: %s", err)
 	}
-
-	topic := "wellness.reminders"
+	//topic temporarly removed
+	//	topic := "wellness.reminders"
 	if len(todos) > 0 {
 		for _, todo := range todos {
-			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO Reminder: %s", todo.Title), todo.Description, map[string]string{
+			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, nil, fmt.Sprintf("TODO Reminder: %s", todo.Title), todo.Description, todo.AppID, todo.OrgID, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
 				"entity_id":   todo.ID,
 				"entity_name": todo.Title,
+				"app_id":      todo.AppID,
+				"org_id":      todo.OrgID,
 			})
 			if err != nil {
 				log.Printf("Error on sending reminder inbox message: %s", err)
@@ -102,12 +104,14 @@ func (app *Application) processReminders() error {
 
 	if len(todos) > 0 {
 		for _, todo := range todos {
-			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, map[string]string{
+			err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, nil, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, todo.AppID, todo.OrgID, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
 				"entity_id":   todo.ID,
 				"entity_name": todo.Title,
+				"app_id":      todo.AppID,
+				"org_id":      todo.OrgID,
 			})
 			if err != nil {
 				log.Printf("Error on sending reminder inbox message: %s", err)

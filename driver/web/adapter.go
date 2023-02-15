@@ -16,13 +16,14 @@ package web
 
 import (
 	"fmt"
-	"github.com/rokwire/core-auth-library-go/authservice"
 	"log"
 	"net/http"
 	"wellness/core"
 	"wellness/core/model"
 	"wellness/driver/web/rest"
 	"wellness/utils"
+
+	"github.com/rokwire/core-auth-library-go/authservice"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/tokenauth"
