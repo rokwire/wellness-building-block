@@ -15,7 +15,6 @@
 package core
 
 import (
-	"fmt"
 	"log"
 	"time"
 	"wellness/core/model"
@@ -74,7 +73,7 @@ func (app *Application) processReminders() error {
 
 	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		log.Printf("Start reminder processing")
-		now := time.Now().UTC()
+		now := time.Now()
 		todos, err := app.storage.GetTodoEntriesWithCurrentDueTime(context, now)
 		if err != nil {
 			log.Printf("Error on retrieving reminders: %s", err)
@@ -95,7 +94,7 @@ func (app *Application) processReminders() error {
 		topic := "wellness.reminders"
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO Reminder: %s", todo.Title), todo.Description, map[string]string{
+				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -103,7 +102,9 @@ func (app *Application) processReminders() error {
 					"entity_name": todo.Title,
 				})
 				if err != nil {
-					log.Printf("Error on sending reminder inbox message: %s", err)
+					log.Printf("Error on sending reminder %s inbox message: %s", todo.ID, err)
+				} else {
+					log.Printf("Sent notification for reminder %s successfully", todo.ID)
 				}
 			}
 		}
@@ -128,7 +129,7 @@ func (app *Application) processReminders() error {
 
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, fmt.Sprintf("TODO: %s", todo.Title), todo.Description, map[string]string{
+				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -136,7 +137,9 @@ func (app *Application) processReminders() error {
 					"entity_name": todo.Title,
 				})
 				if err != nil {
-					log.Printf("Error on sending reminder inbox message: %s", err)
+					log.Printf("Error on sending reminder %s inbox message: %s", todo.ID, err)
+				} else {
+					log.Printf("Sent notification for reminder %s successfully", todo.ID)
 				}
 			}
 		}
