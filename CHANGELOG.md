@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] - 2023-02-15
 ### Changed
-- Invoke ProcessReminders every 60 secs by internal timer instead by AWS scheduled task [#6](https://github.com/rokwire/wellness-building-block/issues/7)
+- Invoke ProcessReminders every 60 secs by internal timer instead by AWS scheduled task [#6](https://github.com/rokwire/wellness-building-block/issues/6)
 
 ### Fixed
 - Fix broken appointment notifications [#7](https://github.com/rokwire/wellness-building-block/issues/7)
