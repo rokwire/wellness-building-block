@@ -7,19 +7,22 @@ import (
 	"log"
 	"net/http"
 	"wellness/core/model"
+
+	"github.com/rokwire/core-auth-library-go/v2/authservice"
 )
 
 // Adapter implements the Notifications interface
 type Adapter struct {
 	internalAPIKey    string
 	baseURL           string
+	accountManager    *authservice.ServiceAccountManager
 	multiTenancyAppID string
 	multiTenancyOrgID string
 }
 
 // NewNotificationsAdapter creates a new Notifications BB adapter instance
-func NewNotificationsAdapter(internalAPIKey, notificationsHost string, mtAppID string, mtOrgID string) *Adapter {
-	return &Adapter{internalAPIKey: internalAPIKey, baseURL: notificationsHost, multiTenancyAppID: mtAppID,
+func NewNotificationsAdapter(internalAPIKey string, accountManager *authservice.ServiceAccountManager, mtAppID string, mtOrgID string) *Adapter {
+	return &Adapter{internalAPIKey: internalAPIKey, accountManager: accountManager, multiTenancyAppID: mtAppID,
 		multiTenancyOrgID: mtOrgID}
 }
 

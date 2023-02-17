@@ -23,7 +23,7 @@ import (
 	"wellness/driver/web/rest"
 	"wellness/utils"
 
-	"github.com/rokwire/core-auth-library-go/authservice"
+	"github.com/rokwire/core-auth-library-go/v2/authservice"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/tokenauth"
