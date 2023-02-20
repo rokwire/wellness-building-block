@@ -16,9 +16,6 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,6 +23,10 @@ import (
 	"time"
 	"wellness/core"
 	"wellness/core/model"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/tokenauth"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb
@@ -382,7 +383,7 @@ func (h ApisHandler) CreateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-	createdItem, err := h.app.Services.CreateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
+	createdItem := h.app.Services.CreateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
 	if err != nil {
 		log.Printf("Error on creating user todo entry: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
