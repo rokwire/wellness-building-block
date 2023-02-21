@@ -76,8 +76,27 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 	})
 }
 
-func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
-	return app.storage.UpdateTodoEntry(appID, orgID, userID, todo)
+func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
+	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		updateTodoEntry, err := app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		if err != nil {
+			log.Printf("Error on retrieving reminders: %s", err)
+		}
+		topic := "update todo entry"
+		err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: updateTodoEntry.UserID}}, &topic, "TODO Reminder", updateTodoEntry.Title, updateTodoEntry.AppID, updateTodoEntry.OrgID, map[string]string{
+			"type":        "wellness_todo_entry",
+			"operation":   "todo_reminder",
+			"entity_type": "wellness_todo_entry",
+			"entity_id":   updateTodoEntry.ID,
+			"entity_name": updateTodoEntry.Title,
+		})
+		if err != nil {
+			log.Printf("Error on sending notification %s inbox message: %s", updateTodoEntry.ID, err)
+		} else {
+			log.Printf("Sent notification %s successfully", updateTodoEntry.ID)
+		}
+		return nil
+	})
 }
 
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {

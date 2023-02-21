@@ -33,7 +33,7 @@ type Services interface {
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) error
-	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
+	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
 
@@ -91,8 +91,8 @@ func (s *servicesImpl) CreateTodoEntry(appID string, orgID string, userID string
 	return s.app.createTodoEntry(appID, orgID, userID, todo)
 }
 
-func (s *servicesImpl) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
-	return s.app.updateTodoEntry(appID, orgID, userID, todo)
+func (s *servicesImpl) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
+	return s.app.updateTodoEntry(appID, orgID, userID, todo, id)
 }
 
 func (s *servicesImpl) DeleteTodoEntry(appID string, orgID string, userID string, id string) error {
@@ -162,7 +162,7 @@ type Storage interface {
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
-	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
+	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error)
 	UpdateTodoEntriesTaskTime(context storage.TransactionContext, ids []string, taskTime time.Time) error
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error

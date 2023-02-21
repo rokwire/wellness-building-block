@@ -315,7 +315,6 @@ func (h ApisHandler) GetUserTodoEntry(claims *tokenauth.Claims, w http.ResponseW
 func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on marshal create a user todo entry - %s\n", err.Error())
@@ -337,7 +336,7 @@ func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-	resData, err := h.app.Services.UpdateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
+	resData := h.app.Services.UpdateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item, id)
 	if err != nil {
 		log.Printf("Error on updating user todo entry with id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
