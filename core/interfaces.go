@@ -183,5 +183,5 @@ type Storage interface {
 
 // Notifications wrapper
 type Notifications interface {
-	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, data map[string]string) error
+	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, data map[string]string) (*string, error)
 }

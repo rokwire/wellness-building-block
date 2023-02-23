@@ -98,8 +98,8 @@ func main() {
 		log.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
-	serviceAccountID := getEnvKey("GR_SERVICE_ACCOUNT_ID", false)
-	privKeyRaw := getEnvKey("GR_PRIV_KEY", true)
+	serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
+	privKeyRaw := getEnvKey("WELLNESS_PRIV_KEY", true)
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
 	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
 	if err != nil {
@@ -122,7 +122,7 @@ func main() {
 
 	// Notification adapter
 	notificationsBaseURL := getEnvKey("NOTIFICATIONS_BASE_URL", true)
-	notificationsAdapter := notifications.NewNotificationsAdapter(notificationsBaseURL, serviceAccountManager, mtAppID, mtOrgID)
+	notificationsAdapter := notifications.NewNotificationsAdapter(notificationsBaseURL, notificationsBaseURL, serviceAccountManager, mtAppID, mtOrgID)
 	if err != nil {
 		log.Fatalf("Error initializing notification adapter: %v", err)
 	}
@@ -139,7 +139,7 @@ func main() {
 		InternalAPIKey: internalAPIKey,
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config, authService)
+	webAdapter := driver.NewWebAdapter(host, port, application, config, serviceRegManager)
 
 	webAdapter.Start()
 }

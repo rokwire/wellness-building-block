@@ -22,8 +22,8 @@ import (
 	"wellness/core/model"
 
 	"github.com/rokwire/core-auth-library-go/authorization"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
 	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
 	"github.com/rokwire/logging-library-go/errors"
 	"github.com/rokwire/logging-library-go/logutils"
 )
@@ -41,8 +41,8 @@ type Auth struct {
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config, authService *authservice.AuthService) *Auth {
-	coreAuth := NewCoreAuth(app, config, authService)
+func NewAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *Auth {
+	coreAuth := NewCoreAuth(app, config, serviceRegManager)
 	internalAuth := newInternalAuth(config.InternalAPIKey)
 
 	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth}
@@ -60,11 +60,11 @@ type CoreAuth struct {
 }
 
 // NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config, authService *authservice.AuthService) *CoreAuth {
+func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *CoreAuth {
 
 	adminPermissionAuth := authorization.NewCasbinAuthorization("driver/web/authorization_model.conf",
 		"driver/web/authorization_policy.csv")
-	tokenAuth, err := tokenauth.NewTokenAuth(true, authService, adminPermissionAuth, nil)
+	tokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, adminPermissionAuth, nil)
 	if err != nil {
 		log.Fatalf("Error intitializing token auth: %v", err)
 	}

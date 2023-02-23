@@ -26,7 +26,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
+	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
 )
 
 const maxUploadSize = 15 * 1024 * 1024 // 15 mb

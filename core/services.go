@@ -60,7 +60,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on retrieving reminders: %s", err)
 		}
 		topic := "create todo entry"
-		err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: createTodoEntry.UserID}}, &topic, "TODO Reminder", createTodoEntry.Title, createTodoEntry.AppID, createTodoEntry.OrgID, map[string]string{
+		_, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: createTodoEntry.UserID}}, &topic, "TODO Reminder", createTodoEntry.Title, createTodoEntry.AppID, createTodoEntry.OrgID, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
@@ -83,7 +83,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on retrieving reminders: %s", err)
 		}
 		topic := "update todo entry"
-		err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: updateTodoEntry.UserID}}, &topic, "TODO Reminder", updateTodoEntry.Title, updateTodoEntry.AppID, updateTodoEntry.OrgID, map[string]string{
+		_, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: updateTodoEntry.UserID}}, &topic, "TODO Reminder", updateTodoEntry.Title, updateTodoEntry.AppID, updateTodoEntry.OrgID, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
@@ -109,7 +109,7 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 
 		topic := "delete todo entry"
 		title := "delete todo entry"
-		err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", title, appID, orgID, map[string]string{
+		_, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", title, appID, orgID, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
@@ -154,7 +154,7 @@ func (app *Application) processReminders() error {
 		topic := "wellness.reminders"
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
+				_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -189,7 +189,7 @@ func (app *Application) processReminders() error {
 
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
+				_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
