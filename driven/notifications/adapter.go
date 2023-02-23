@@ -92,7 +92,28 @@ func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, to
 	return nil, nil
 }
 
-// DeleteNotificationsMessage deletes notifications message
-func (a *Adapter) DeleteNotificationsMessage() error {
+// DeleteNotification deletes notification
+func (na *Adapter) DeleteNotification(appID string, orgID string, id string) error {
+
+	url := fmt.Sprintf("%s/api/bbs/message/%s", na.baseURL, id)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		log.Printf("DeleteNotification:error creating load user data request - %s", err)
+		return err
+	}
+
+	resp, err := na.accountManager.MakeRequest(req, appID, orgID)
+	if err != nil {
+		log.Printf("DeleteNotification: error sending request - %s", err)
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		log.Printf("SendNotification: error with response code - %d", resp.StatusCode)
+		return fmt.Errorf("DeleteNotification: error with response code != 200")
+	}
 	return nil
 }
