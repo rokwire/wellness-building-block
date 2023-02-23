@@ -68,3 +68,8 @@ func (a *Adapter) SendNotification(recipients []model.NotificationRecipient, top
 	}
 	return nil
 }
+
+// DeleteNotificationsMessage deletes notifications message
+func (a *Adapter) DeleteNotificationsMessage() error {
+	return nil
+}

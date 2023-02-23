@@ -184,4 +184,5 @@ type Storage interface {
 // Notifications wrapper
 type Notifications interface {
 	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, time *int64, data map[string]string) error
+	DeleteNotificationsMessage() error
 }
