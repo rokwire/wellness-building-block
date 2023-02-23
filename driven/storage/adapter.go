@@ -301,13 +301,13 @@ func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, ca
 }
 
 // UpdateTodoEntry updates a todo entry
-func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
 
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "_id", Value: todo.ID}}
+		primitive.E{Key: "_id", Value: id}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "title", Value: todo.Title},
@@ -329,7 +329,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 		return nil, err
 	}
 
-	return sa.GetTodoEntry(appID, orgID, userID, todo.ID)
+	return sa.GetTodoEntry(appID, orgID, userID, id)
 }
 
 // DeleteTodoEntry deletes a todo entry
