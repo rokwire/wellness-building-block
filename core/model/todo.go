@@ -38,23 +38,25 @@ func (c *TodoCategory) ToCategoryRef() CategoryRef {
 
 // TodoEntry user todo entry
 type TodoEntry struct {
-	ID               string       `json:"id" bson:"_id"`
-	OrgID            string       `json:"org_id" bson:"org_id"`
-	AppID            string       `json:"app_id" bson:"app_id"`
-	UserID           string       `json:"user_id" bson:"user_id"`
-	Title            string       `json:"title" bson:"title"`
-	Description      string       `json:"description" bson:"description"`
-	Category         *CategoryRef `json:"category" bson:"category"`
-	WorkDays         []string     `json:"work_days" bson:"work_days"`
-	Location         *string      `json:"location" bson:"location"`
-	Completed        bool         `json:"completed" bson:"completed"`
-	HasDueTime       bool         `json:"has_due_time" bson:"has_due_time"`
-	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
-	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
-	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
-	TaskTime         *time.Time   `json:"task_time" bson:"task_time"`
-	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
-	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
+	ID                    string       `json:"id" bson:"_id"`
+	OrgID                 string       `json:"org_id" bson:"org_id"`
+	AppID                 string       `json:"app_id" bson:"app_id"`
+	UserID                string       `json:"user_id" bson:"user_id"`
+	Title                 string       `json:"title" bson:"title"`
+	Description           string       `json:"description" bson:"description"`
+	Category              *CategoryRef `json:"category" bson:"category"`
+	WorkDays              []string     `json:"work_days" bson:"work_days"`
+	Location              *string      `json:"location" bson:"location"`
+	Completed             bool         `json:"completed" bson:"completed"`
+	HasDueTime            bool         `json:"has_due_time" bson:"has_due_time"`
+	DueDateTime           *time.Time   `json:"due_date_time" bson:"due_date_time"`
+	DueDateMessageID      string       `json:"due_date_message_id" bson:"due_date_message_id"`
+	ReminderType          string       `json:"reminder_type" bson:"reminder_type"`
+	ReminderDateTime      *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
+	ReminderDateMessageID string       `json:"reminder_date_message_id" bson:"reminder_date_message_id"`
+	TaskTime              *time.Time   `json:"task_time" bson:"task_time"`
+	DateCreated           time.Time    `json:"date_created" bson:"date_created"`
+	DateUpdated           *time.Time   `json:"date_updated" bson:"date_updated"`
 } // @name TodoEntry
 
 // CategoryRef used as a reference within the TodoEntry
