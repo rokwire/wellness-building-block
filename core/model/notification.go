@@ -10,6 +10,7 @@ type NotificationMessage struct {
 	Subject string              `json:"subject" bson:"subject"`
 	Sender  *NotificationSender `json:"sender,omitempty" bson:"sender,omitempty"`
 	Body    string              `json:"body" bson:"body"`
+	Time    *int64              `json:"time,omitempty"`
 	Data    map[string]string   `json:"data" bson:"data"`
 }
 
