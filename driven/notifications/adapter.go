@@ -33,11 +33,11 @@ func NewNotificationsAdapter(internalAPIKey string, notificationsHost string, ac
 }
 
 // SendNotification sends notification to a user
-func (na *Adapter) SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, data map[string]string) (*string, error) {
-	return na.sendNotification(recipients, topic, title, text, appID, orgID, data)
+func (na *Adapter) SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, time *int64, data map[string]string) (*string, error) {
+	return na.sendNotification(recipients, topic, title, text, appID, orgID, time, data)
 }
 
-func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, data map[string]string) (*string, error) {
+func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, time *int64, data map[string]string) (*string, error) {
 	if len(recipients) > 0 {
 		url := fmt.Sprintf("%s/api/bbs/message", na.baseURL)
 
@@ -51,6 +51,7 @@ func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, to
 			"subject":    title,
 			"body":       text,
 			"data":       data,
+			"time":       time,
 		}
 		bodyData := map[string]interface{}{
 			"async":   async,
