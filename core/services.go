@@ -94,24 +94,37 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
 	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 
-		updateTodoEntry, err := app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
 		if err != nil {
-			log.Printf("Error on retrieving reminders: %s", err)
+			log.Printf("Error on getting todo entry: %s", err)
 		}
+
+		messageIDs := todoEntry.MessageIDs
+		if messageIDs.DueDateMessageID != todo.MessageIDs.DueDateMessageID {
+			err = app.notifications.DeleteNotification(appID, orgID, *messageIDs.DueDateMessageID)
+		}
+
+		if messageIDs.ReminderDateMessageID != todo.MessageIDs.ReminderDateMessageID {
+			err = app.notifications.DeleteNotification(appID, orgID, *messageIDs.ReminderDateMessageID)
+		}
+
 		topic := "update todo entry"
-		_, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: updateTodoEntry.UserID}}, &topic, "TODO Reminder", updateTodoEntry.Title, updateTodoEntry.AppID, updateTodoEntry.OrgID, nil, map[string]string{
+		_, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, nil, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
-			"entity_id":   updateTodoEntry.ID,
-			"entity_name": updateTodoEntry.Title,
+			"entity_id":   todo.ID,
+			"entity_name": todo.Title,
 		})
 		if err != nil {
-			log.Printf("Error on sending notification %s inbox message: %s", updateTodoEntry.ID, err)
+			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 		} else {
-			log.Printf("Sent notification %s successfully", updateTodoEntry.ID)
+			log.Printf("Sent notification %s successfully", todo.ID)
 		}
-
+		_, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		if err != nil {
+			log.Printf("Error on retrieving reminders: %s", err)
+		}
 		return nil
 	})
 }

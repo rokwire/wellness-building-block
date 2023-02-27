@@ -321,6 +321,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
 			primitive.E{Key: "task_time", Value: todo.TaskTime},
+			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
