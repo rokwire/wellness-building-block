@@ -286,12 +286,13 @@ func (sa *Adapter) GetTodoEntry(appID string, orgID string, userID string, id st
 }
 
 // CreateTodoEntry create a todo entry
-func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error) {
+func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry, messageIDs model.MessageIDs) (*model.TodoEntry, error) {
 	category.ID = uuid.NewString()
 	category.OrgID = orgID
 	category.AppID = appID
 	category.UserID = userID
 	category.DateCreated = time.Now().UTC()
+	category.MessageIDs = messageIDs
 
 	_, err := sa.db.todoEntries.InsertOne(&category)
 	if err != nil {
