@@ -101,11 +101,11 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 
 		messageIDs := todoEntry.MessageIDs
 		if messageIDs.DueDateMessageID != todo.MessageIDs.DueDateMessageID {
-			err = app.notifications.DeleteNotification(appID, orgID, *messageIDs.DueDateMessageID)
+			return app.notifications.DeleteNotification(appID, orgID, *messageIDs.DueDateMessageID)
 		}
 
 		if messageIDs.ReminderDateMessageID != todo.MessageIDs.ReminderDateMessageID {
-			err = app.notifications.DeleteNotification(appID, orgID, *messageIDs.ReminderDateMessageID)
+			return app.notifications.DeleteNotification(appID, orgID, *messageIDs.ReminderDateMessageID)
 		}
 
 		topic := "update todo entry"
