@@ -140,7 +140,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 		}
 		_, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
 		if err != nil {
-			log.Printf("Error on retrieving reminders: %s", err)
+			log.Printf("Error on updating todo entry: %s", err)
 		}
 		return nil
 	})
