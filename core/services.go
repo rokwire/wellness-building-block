@@ -84,7 +84,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 
 		_, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
 		if err != nil {
-			log.Printf("Error on retrieving reminders: %s", err)
+			log.Printf("Error on creating todo entry: %s", err)
 		}
 		return nil
 	})
