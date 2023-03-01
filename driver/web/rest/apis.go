@@ -336,7 +336,7 @@ func (h ApisHandler) UpdateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-	resData := h.app.Services.UpdateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item, id)
+	resData, err := h.app.Services.UpdateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item, id)
 	if err != nil {
 		log.Printf("Error on updating user todo entry with id - %s\n %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -382,7 +382,7 @@ func (h ApisHandler) CreateUserTodoEntry(claims *tokenauth.Claims, w http.Respon
 		return
 	}
 
-	createdItem := h.app.Services.CreateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
+	createdItem, err := h.app.Services.CreateTodoEntry(claims.AppID, claims.OrgID, claims.Subject, &item)
 	if err != nil {
 		log.Printf("Error on creating user todo entry: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

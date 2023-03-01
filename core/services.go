@@ -91,15 +91,15 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 	return createTodoEntry, err
 }
 
-func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
-	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-
+func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
+	var updateTodoEntry *model.TodoEntry
+	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
 		if err != nil {
 			log.Printf("Error on getting todo entry: %s", err)
 		}
 
-		if todoEntry.DueDateTime != todo.DueDateTime || todoEntry.MessageIDs.DueDateMessageID == nil {
+		if todoEntry.DueDateTime != todo.DueDateTime || todoEntry.DueDateTime == nil {
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notificarion")
@@ -143,12 +143,13 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			}
 		}
 
-		_, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
 		if err != nil {
 			log.Printf("Error on updating todo entry: %s", err)
 		}
 		return nil
 	})
+	return updateTodoEntry, err
 }
 
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {
