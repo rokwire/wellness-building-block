@@ -99,7 +99,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on getting todo entry: %s", err)
 		}
 
-		if todoEntry.DueDateTime != todo.DueDateTime || todoEntry.DueDateTime == nil {
+		if todoEntry.DueDateTime != todo.DueDateTime && todoEntry.MessageIDs.DueDateMessageID != nil {
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notificarion")
@@ -121,8 +121,8 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			}
 		}
 
-		if todoEntry.ReminderDateTime != todo.ReminderDateTime || todoEntry.MessageIDs.DueDateMessageID == nil {
-			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
+		if todoEntry.ReminderDateTime != todo.ReminderDateTime && todoEntry.MessageIDs.ReminderDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notificarion")
 			}
@@ -160,7 +160,7 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on getting todo entry: %s", err)
 		}
 
-		if todoEntry.DueDateTime != nil || todoEntry.DueDateTime == nil {
+		if todoEntry.DueDateTime != nil && todoEntry.MessageIDs.DueDateMessageID != nil {
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notificarion")
@@ -181,8 +181,8 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			}
 		}
 
-		if todoEntry.ReminderDateTime != nil || todoEntry.ReminderDateTime == nil {
-			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
+		if todoEntry.ReminderDateTime != nil && todoEntry.MessageIDs.ReminderDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notificarion")
 			}
