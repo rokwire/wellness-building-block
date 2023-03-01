@@ -32,7 +32,7 @@ type Services interface {
 
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
-	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) error
+	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
@@ -87,7 +87,7 @@ func (s *servicesImpl) GetTodoEntry(appID string, orgID string, userID string, i
 	return s.app.getTodoEntry(appID, orgID, userID, id)
 }
 
-func (s *servicesImpl) CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) error {
+func (s *servicesImpl) CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
 	return s.app.createTodoEntry(appID, orgID, userID, todo)
 }
 

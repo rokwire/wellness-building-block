@@ -53,9 +53,9 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 	return app.storage.GetTodoEntry(appID, orgID, userID, id)
 }
 
-func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) error {
-	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-
+func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+	var createTodoEntry *model.TodoEntry
+	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		topic := "create todo entry"
 		dueDateTime := todo.DueDateTime.Unix()
 		duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &dueDateTime, map[string]string{
@@ -82,13 +82,13 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 		}
 		messageIDs := model.MessageIDs{ReminderDateMessageID: reminderMsg, DueDateMessageID: duoMsg}
 
-		_, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
+		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
 		if err != nil {
 			log.Printf("Error on creating todo entry: %s", err)
 		}
 		return nil
 	})
-
+	return createTodoEntry, err
 }
 
 func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
