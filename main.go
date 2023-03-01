@@ -1,3 +1,17 @@
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 /*
  *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
  *   All rights reserved.
@@ -23,9 +37,13 @@ import (
 	"strings"
 	"wellness/core"
 	"wellness/core/model"
-	cacheadapter "wellness/driven/cache"
+	"wellness/driven/notifications"
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
+
+	"github.com/golang-jwt/jwt"
+	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/core-auth-library-go/v2/sigauth"
 )
 
 var (
@@ -42,6 +60,13 @@ func main() {
 
 	port := getEnvKey("PORT", true)
 
+	internalAPIKey := getEnvKey("INTERNAL_API_KEY", true)
+
+	// web adapter
+	host := getEnvKey("WELLNESS_HOST", true)
+	coreBBHost := getEnvKey("WELLNESS_CORE_BB_HOST", true)
+	serviceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
+
 	//mongoDB adapter
 	mongoDBAuth := getEnvKey("WELLNESS_MONGO_AUTH", true)
 	mongoDBName := getEnvKey("WELLNESS_MONGO_DATABASE", true)
@@ -52,27 +77,69 @@ func main() {
 		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
 	}
 
-	defaultCacheExpirationSeconds := getEnvKey("WELLNESS_DEFAULT_CACHE_EXPIRATION_SECONDS", false)
-	cacheAdapter := cacheadapter.NewCacheAdapter(defaultCacheExpirationSeconds)
-
 	mtAppID := getEnvKey("WELLNESS_MULTI_TENANCY_APP_ID", true)
 	mtOrgID := getEnvKey("WELLNESS_MULTI_TENANCY_ORG_ID", true)
+	//serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 
-	// application
-	application := core.NewApplication(Version, Build, storageAdapter, cacheAdapter, mtAppID, mtOrgID)
-	application.Start()
-
-	// web adapter
-	host := getEnvKey("WELLNESS_HOST", true)
-	coreBBHost := getEnvKey("WELLNESS_CORE_BB_HOST", true)
-	serviceURL := getEnvKey("WELLNESS_SERVICE_URL", true)
-
-	config := model.Config{
-		CoreBBHost: coreBBHost,
-		ServiceURL: serviceURL,
+	authService := authservice.AuthService{
+		ServiceID:   "wellness",
+		ServiceHost: serviceURL,
+		FirstParty:  true,
+		AuthBaseURL: coreBBHost,
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config)
+	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, []string{"rewards"})
+	if err != nil {
+		log.Fatalf("Error initializing remote service registration loader: %v", err)
+	}
+
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader)
+	if err != nil {
+		log.Fatalf("Error initializing service registration manager: %v", err)
+	}
+
+	serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
+	privKeyRaw := getEnvKey("WELLNESS_PRIV_KEY", true)
+	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
+	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
+	if err != nil {
+		log.Fatalf("Error parsing priv key: %v", err)
+	}
+	signatureAuth, err := sigauth.NewSignatureAuth(privKey, serviceRegManager, false)
+	if err != nil {
+		log.Fatalf("Error initializing signature auth: %v", err)
+	}
+
+	serviceAccountLoader, err := authservice.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
+	if err != nil {
+		log.Fatalf("Error initializing remote service account loader: %v", err)
+	}
+
+	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
+	if err != nil {
+		log.Fatalf("Error initializing service account manager: %v", err)
+	}
+
+	// Notification adapter
+	notificationsBaseURL := getEnvKey("NOTIFICATIONS_BASE_URL", true)
+	notificationsAdapter := notifications.NewNotificationsAdapter(notificationsBaseURL, notificationsBaseURL, serviceAccountManager, mtAppID, mtOrgID)
+	if err != nil {
+		log.Fatalf("Error initializing notification adapter: %v", err)
+	}
+
+	//notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
+
+	// application
+	application := core.NewApplication(Version, Build, storageAdapter, notificationsAdapter, mtAppID, mtOrgID)
+	application.Start()
+
+	config := model.Config{
+		CoreBBHost:     coreBBHost,
+		ServiceURL:     serviceURL,
+		InternalAPIKey: internalAPIKey,
+	}
+
+	webAdapter := driver.NewWebAdapter(host, port, application, config, serviceRegManager)
 
 	webAdapter.Start()
 }

@@ -1,19 +1,16 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package storage
 
@@ -44,6 +41,10 @@ func (collWrapper *collectionWrapper) FindWithContext(ctx context.Context, filte
 
 func (collWrapper *collectionWrapper) FindWithParams(ctx context.Context, filter interface{}, result interface{},
 	findOptions *options.FindOptions, timeout *time.Duration) error {
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
 
 	//set timeout
 	if timeout == nil {
@@ -218,6 +219,11 @@ func (collWrapper *collectionWrapper) UpdateMany(filter interface{}, update inte
 }
 
 func (collWrapper *collectionWrapper) UpdateManyWithContext(ctx context.Context, filter interface{}, update interface{}, opts *options.UpdateOptions) (*mongo.UpdateResult, error) {
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
 	defer cancel()
 
@@ -275,7 +281,7 @@ func (collWrapper *collectionWrapper) Watch(pipeline interface{}, l *logs.Logger
 	}
 }
 
-//Helper function for Watch
+// Helper function for Watch
 func (collWrapper *collectionWrapper) watch(pipeline interface{}, resumeToken bson.Raw, l *logs.Logger) (bson.Raw, error) {
 	if pipeline == nil {
 		pipeline = []bson.M{}

@@ -1,6 +1,11 @@
-# Wellness building block
+# Wellness Building Block
 
-Go project to provide rest service for Rokwire Wellness building block content results.
+The Wellness Building Block manages user wellness data, including wellness ring progress and todo lists, for the Rokwire platform.
+
+## Documentation
+The functionality provided by this application is documented in the [Wiki](https://github.com/rokwire/wellness-building-block/wiki).
+
+The API documentation is available here: https://api.rokwire.illinois.edu/wellness/doc/ui/index.html
 
 ## Set Up
 
@@ -13,18 +18,19 @@ Go v1.16+
 ### Environment variables
 The following Environment variables are supported. The service will not start unless those marked as Required are supplied.
 
-Name|Value|Required|Description
+Name|Format|Required|Description
 ---|---|---|---
-PORT | < value > | yes | The port number of the listening port
-WELLNESS_HOST | < value > | yes | Host name
+PORT | < int > | yes | Port to be used by this application
 WELLNESS_MONGO_AUTH | <mongodb://USER:PASSWORD@HOST:PORT/DATABASE NAME> | yes | MongoDB authentication string. The user must have read/write privileges.
-WELLNESS_MONGO_DATABASE | < value > | yes | MongoDB database name
-WELLNESS_MONGO_TIMEOUT | < value > | no | MongoDB timeout in milliseconds. Set default value(500 milliseconds) if omitted
-WELLNESS_CORE_BB_HOST | < value > | yes | Core BB host url
-WELLNESS_SERVICE_URL | < value > | yes | The service host url
-WELLNESS_DEFAULT_CACHE_EXPIRATION_SECONDS | < value > | false | Default cache expiration time in seconds. Default: 120
-WELLNESS_MULTI_TENANCY_APP_ID | < value > | yes | Application ID for moving from single to multi tenancy for the already exisiting data
-WELLNESS_MULTI_TENANCY_ORG_ID | < value > | yes | Organization ID for moving from single to multi tenancy for the already exisiting data
+WELLNESS_MONGO_DATABASE | < string > | yes | MongoDB database name
+WELLNESS_MONGO_TIMEOUT | < int > | no | MongoDB timeout in milliseconds. Defaults to 500.
+WELLNESS_MULTI_TENANCY_APP_ID | < string > | yes | Application ID for migrating existing data to multi-tenancy
+WELLNESS_MULTI_TENANCY_ORG_ID | < string > | yes | Organization ID for migrating existing data to multi-tenancy
+WELLNESS_HOST | < url > | yes | URL where this application is being hosted
+WELLNESS_CORE_BB_HOST | < url > | yes | Core BB host URL
+WELLNESS_SERVICE_URL | < url > | yes | URL where this application is being hosted
+INTERNAL_API_KEY | < string > | yes | Internal API key for invocation by other BBs
+
 ### Run Application
 
 #### Run locally without Docker
@@ -115,8 +121,15 @@ Response
 1.9.0
 ```
 
-## Documentation
+## Contributing
+If you would like to contribute to this project, please be sure to read the [Contributing Guidelines](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [Conventions](CONVENTIONS.md) before beginning.
 
-The documentation is placed here - https://api-dev.rokwire.illinois.edu/docs/
+### Secret Detection
+This repository is configured with a [pre-commit](https://pre-commit.com/) hook that runs [Yelp's Detect Secrets](https://github.com/Yelp/detect-secrets). If you intend to contribute directly to this repository, you must install pre-commit on your local machine to ensure that no secrets are pushed accidentally.
 
-Alternatively the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/wellness/doc/ui/
+```
+# Install software 
+$ git pull  # Pull in pre-commit configuration & baseline 
+$ pip install pre-commit 
+$ pre-commit install
+```

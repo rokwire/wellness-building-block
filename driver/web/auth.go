@@ -1,37 +1,34 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package web
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"wellness/core"
 	"wellness/core/model"
 
 	"github.com/rokwire/core-auth-library-go/authorization"
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
+	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
 	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logs"
 	"github.com/rokwire/logging-library-go/logutils"
 )
 
-//Authorization is an interface for auth types
+// Authorization is an interface for auth types
 type Authorization interface {
 	check(req *http.Request) (int, *tokenauth.Claims, error)
 	start()
@@ -39,14 +36,16 @@ type Authorization interface {
 
 // Auth handler
 type Auth struct {
-	coreAuth *CoreAuth
+	coreAuth     *CoreAuth
+	internalAuth *InternalAuth
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config) *Auth {
-	coreAuth := NewCoreAuth(app, config)
+func NewAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *Auth {
+	coreAuth := NewCoreAuth(app, config, serviceRegManager)
+	internalAuth := newInternalAuth(config.InternalAPIKey)
 
-	auth := Auth{coreAuth: coreAuth}
+	auth := Auth{coreAuth: coreAuth, internalAuth: internalAuth}
 	return &auth
 }
 
@@ -61,21 +60,11 @@ type CoreAuth struct {
 }
 
 // NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
-
-	remoteConfig := authservice.RemoteAuthDataLoaderConfig{
-		AuthServicesHost: config.CoreBBHost,
-	}
-
-	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core"}, logs.NewLogger("wellness", &logs.LoggerOpts{}))
-	authService, err := authservice.NewAuthService("wellness", config.ServiceURL, serviceLoader)
-	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
-	}
+func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *CoreAuth {
 
 	adminPermissionAuth := authorization.NewCasbinAuthorization("driver/web/authorization_model.conf",
 		"driver/web/authorization_policy.csv")
-	tokenAuth, err := tokenauth.NewTokenAuth(true, authService, adminPermissionAuth, nil)
+	tokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, adminPermissionAuth, nil)
 	if err != nil {
 		log.Fatalf("Error intitializing token auth: %v", err)
 	}
@@ -88,8 +77,8 @@ func NewCoreAuth(app *core.Application, config model.Config) *CoreAuth {
 	return &auth
 }
 
-//PermissionsAuth entity
-//This enforces that the user has permissions matching the policy
+// PermissionsAuth entity
+// This enforces that the user has permissions matching the policy
 type PermissionsAuth struct {
 	tokenAuth *tokenauth.TokenAuth
 }
@@ -117,7 +106,7 @@ func newPermissionsAuth(tokenAuth *tokenauth.TokenAuth) *PermissionsAuth {
 	return &permissionsAuth
 }
 
-//UserAuth entity
+// UserAuth entity
 // This enforces that the user is not anonymous
 type UserAuth struct {
 	tokenAuth *tokenauth.TokenAuth
@@ -145,7 +134,7 @@ func newUserAuth(tokenAuth *tokenauth.TokenAuth) *UserAuth {
 	return &userAuth
 }
 
-//StandardAuth entity
+// StandardAuth entity
 // This enforces standard auth check
 type StandardAuth struct {
 	tokenAuth *tokenauth.TokenAuth
@@ -165,4 +154,24 @@ func (a *StandardAuth) check(req *http.Request) (int, *tokenauth.Claims, error) 
 func newStandardAuth(tokenAuth *tokenauth.TokenAuth) *StandardAuth {
 	standartAuth := StandardAuth{tokenAuth: tokenAuth}
 	return &standartAuth
+}
+
+// InternalAuth entity
+// This enforces Internal API Key auth check
+type InternalAuth struct {
+	internalAPIKey string
+}
+
+func (a *InternalAuth) check(req *http.Request) (int, error) {
+	internalAPIKey := req.Header.Get("INTERNAL-API-KEY")
+	if internalAPIKey != a.internalAPIKey {
+		return http.StatusUnauthorized, errors.WrapErrorAction("typeCheckServicesInternalAPIKey", logutils.TypeRequest, nil, fmt.Errorf("wrong or missing INTERNAL-API-KEY request header"))
+	}
+
+	return http.StatusOK, nil
+}
+
+func newInternalAuth(internalAPIKey string) *InternalAuth {
+	auth := InternalAuth{internalAPIKey: internalAPIKey}
+	return &auth
 }
