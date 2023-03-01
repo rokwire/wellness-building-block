@@ -41,8 +41,9 @@ import (
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
 
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/logging-library-go/logs"
+	"github.com/golang-jwt/jwt"
+	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/core-auth-library-go/v2/sigauth"
 )
 
 var (
@@ -78,26 +79,55 @@ func main() {
 
 	mtAppID := getEnvKey("WELLNESS_MULTI_TENANCY_APP_ID", true)
 	mtOrgID := getEnvKey("WELLNESS_MULTI_TENANCY_ORG_ID", true)
+	//serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 
-	remoteConfig := authservice.RemoteAuthDataLoaderConfig{
-		AuthServicesHost: coreBBHost,
-	}
-	serviceLoader, err := authservice.NewRemoteAuthDataLoader(remoteConfig, []string{"core", "notifications"}, logs.NewLogger("wellness", &logs.LoggerOpts{}))
-	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
-	}
-
-	authService, err := authservice.NewAuthService("wellness", serviceURL, serviceLoader)
-	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
+	authService := authservice.AuthService{
+		ServiceID:   "wellness",
+		ServiceHost: serviceURL,
+		FirstParty:  true,
+		AuthBaseURL: coreBBHost,
 	}
 
-	// Notifications service reg
-	notificationsServiceReg, err := authService.GetServiceReg("notifications")
+	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, []string{"rewards"})
 	if err != nil {
-		log.Fatalf("error finding notifications service reg: %s", err)
+		log.Fatalf("Error initializing remote service registration loader: %v", err)
 	}
-	notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
+
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader)
+	if err != nil {
+		log.Fatalf("Error initializing service registration manager: %v", err)
+	}
+
+	serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
+	privKeyRaw := getEnvKey("WELLNESS_PRIV_KEY", true)
+	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
+	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
+	if err != nil {
+		log.Fatalf("Error parsing priv key: %v", err)
+	}
+	signatureAuth, err := sigauth.NewSignatureAuth(privKey, serviceRegManager, false)
+	if err != nil {
+		log.Fatalf("Error initializing signature auth: %v", err)
+	}
+
+	serviceAccountLoader, err := authservice.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
+	if err != nil {
+		log.Fatalf("Error initializing remote service account loader: %v", err)
+	}
+
+	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
+	if err != nil {
+		log.Fatalf("Error initializing service account manager: %v", err)
+	}
+
+	// Notification adapter
+	notificationsBaseURL := getEnvKey("NOTIFICATIONS_BASE_URL", true)
+	notificationsAdapter := notifications.NewNotificationsAdapter(notificationsBaseURL, notificationsBaseURL, serviceAccountManager, mtAppID, mtOrgID)
+	if err != nil {
+		log.Fatalf("Error initializing notification adapter: %v", err)
+	}
+
+	//notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
 
 	// application
 	application := core.NewApplication(Version, Build, storageAdapter, notificationsAdapter, mtAppID, mtOrgID)
@@ -109,7 +139,7 @@ func main() {
 		InternalAPIKey: internalAPIKey,
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config, authService)
+	webAdapter := driver.NewWebAdapter(host, port, application, config, serviceRegManager)
 
 	webAdapter.Start()
 }

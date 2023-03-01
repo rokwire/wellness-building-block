@@ -52,10 +52,17 @@ type TodoEntry struct {
 	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
 	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
 	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
+	MessageIDs       MessageIDs   `json:"message_ids" bson:"message_ids"`
 	TaskTime         *time.Time   `json:"task_time" bson:"task_time"`
 	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
 	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
 } // @name TodoEntry
+
+// MessageIDs is used to collect due and reminder time messages
+type MessageIDs struct {
+	ReminderDateMessageID *string `json:"reminder_date_message_id" bson:"reminder_date_message_id"`
+	DueDateMessageID      *string `json:"due_date_message_id" bson:"due_date_message_id"`
+}
 
 // CategoryRef used as a reference within the TodoEntry
 type CategoryRef struct {

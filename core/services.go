@@ -54,15 +54,170 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 }
 
 func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
-	return app.storage.CreateTodoEntry(appID, orgID, userID, todo)
+	var createTodoEntry *model.TodoEntry
+	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		topic := "create todo entry"
+		dueDateTime := todo.DueDateTime.Unix()
+		duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &dueDateTime, map[string]string{
+			"type":        "wellness_todo_entry",
+			"operation":   "todo_reminder",
+			"entity_type": "wellness_todo_entry",
+			"entity_id":   todo.ID,
+			"entity_name": todo.Title,
+		})
+
+		reminderDateTime := todo.ReminderDateTime.Unix()
+		reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &reminderDateTime, map[string]string{
+			"type":        "wellness_todo_entry",
+			"operation":   "todo_reminder",
+			"entity_type": "wellness_todo_entry",
+			"entity_id":   todo.ID,
+			"entity_name": todo.Title,
+		})
+
+		if err != nil {
+			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
+			return err
+		} else {
+			log.Printf("Sent notification %s successfully", todo.ID)
+		}
+		messageIDs := model.MessageIDs{ReminderDateMessageID: reminderMsg, DueDateMessageID: duoMsg}
+
+		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
+		if err != nil {
+			log.Printf("Error on creating todo entry: %s", err)
+		}
+		return nil
+	})
+	return createTodoEntry, err
 }
 
-func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
-	return app.storage.UpdateTodoEntry(appID, orgID, userID, todo)
+func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
+	var updateTodoEntry *model.TodoEntry
+	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
+		if err != nil {
+			log.Printf("Error on getting todo entry: %s", err)
+		}
+
+		if todoEntry.DueDateTime != todo.DueDateTime && todoEntry.MessageIDs.DueDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
+			if err != nil {
+				log.Printf("Error on delete notification")
+				return err
+			}
+			topic := "update due date time"
+			dueDateTime := todo.DueDateTime.Unix()
+			duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &dueDateTime, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todo.ID,
+				"entity_name": todo.Title,
+			})
+			todo.MessageIDs.DueDateMessageID = duoMsg
+			if err != nil {
+				log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
+				return err
+			} else {
+				log.Printf("Sent notification %s successfully", todo.ID)
+			}
+		}
+
+		if todoEntry.ReminderDateTime != todo.ReminderDateTime && todoEntry.MessageIDs.ReminderDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
+			if err != nil {
+				log.Printf("Error on delete notification")
+				return err
+			}
+			topic := "update reminder date time"
+			reminderDateTime := todo.ReminderDateTime.Unix()
+			reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &reminderDateTime, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todo.ID,
+				"entity_name": todo.Title,
+			})
+			todo.MessageIDs.ReminderDateMessageID = reminderMsg
+			if err != nil {
+				log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
+				return err
+			} else {
+				log.Printf("Sent notification %s successfully", todo.ID)
+			}
+		}
+
+		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		if err != nil {
+			log.Printf("Error on updating todo entry: %s", err)
+		}
+		return nil
+	})
+	return updateTodoEntry, err
 }
 
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {
-	return app.storage.DeleteTodoEntry(appID, orgID, userID, id)
+
+	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
+		if err != nil {
+			log.Printf("Error on getting todo entry: %s", err)
+		}
+
+		if todoEntry.DueDateTime != nil && todoEntry.MessageIDs.DueDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
+			if err != nil {
+				log.Printf("Error on delete notificarion")
+				return err
+			}
+			topic := "delete due date time"
+			dueDateTime := todoEntry.DueDateTime.Unix()
+			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, todoEntry.AppID, todoEntry.OrgID, &dueDateTime, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todoEntry.ID,
+				"entity_name": todoEntry.Title,
+			})
+			if err != nil {
+				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
+				return err
+			} else {
+				log.Printf("Sent notification %s successfully", todoEntry.ID)
+			}
+		}
+
+		if todoEntry.ReminderDateTime != nil && todoEntry.MessageIDs.ReminderDateMessageID != nil {
+			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
+			if err != nil {
+				log.Printf("Error on delete notificarion")
+				return err
+			}
+			topic := "delete reminder date time"
+			reminderDateTime := todoEntry.ReminderDateTime.Unix()
+			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, todoEntry.AppID, todoEntry.OrgID, &reminderDateTime, map[string]string{
+				"type":        "wellness_todo_entry",
+				"operation":   "todo_reminder",
+				"entity_type": "wellness_todo_entry",
+				"entity_id":   todoEntry.ID,
+				"entity_name": todoEntry.Title,
+			})
+			if err != nil {
+				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
+				return err
+			} else {
+				log.Printf("Sent notification %s successfully", todoEntry.ID)
+			}
+		}
+
+		err = app.storage.DeleteTodoEntry(appID, orgID, userID, id)
+		if err != nil {
+			log.Printf("Error on delete todo entry: %s", err)
+		}
+
+		return nil
+	})
 }
 
 func (app *Application) deleteCompletedTodoEntries(appID string, orgID string, userID string) error {
@@ -94,7 +249,7 @@ func (app *Application) processReminders() error {
 		topic := "wellness.reminders"
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
+				_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, nil, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -129,7 +284,7 @@ func (app *Application) processReminders() error {
 
 		if len(todos) > 0 {
 			for _, todo := range todos {
-				err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, map[string]string{
+				_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, nil, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",

@@ -286,12 +286,13 @@ func (sa *Adapter) GetTodoEntry(appID string, orgID string, userID string, id st
 }
 
 // CreateTodoEntry create a todo entry
-func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry) (*model.TodoEntry, error) {
+func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry, messageIDs model.MessageIDs) (*model.TodoEntry, error) {
 	category.ID = uuid.NewString()
 	category.OrgID = orgID
 	category.AppID = appID
 	category.UserID = userID
 	category.DateCreated = time.Now().UTC()
+	category.MessageIDs = messageIDs
 
 	_, err := sa.db.todoEntries.InsertOne(&category)
 	if err != nil {
@@ -301,13 +302,13 @@ func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, ca
 }
 
 // UpdateTodoEntry updates a todo entry
-func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
 
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
-		primitive.E{Key: "_id", Value: todo.ID}}
+		primitive.E{Key: "_id", Value: id}}
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "title", Value: todo.Title},
@@ -320,6 +321,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
 			primitive.E{Key: "task_time", Value: todo.TaskTime},
+			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
@@ -329,7 +331,7 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 		return nil, err
 	}
 
-	return sa.GetTodoEntry(appID, orgID, userID, todo.ID)
+	return sa.GetTodoEntry(appID, orgID, userID, id)
 }
 
 // DeleteTodoEntry deletes a todo entry
