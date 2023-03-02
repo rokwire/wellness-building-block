@@ -90,6 +90,9 @@ func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, to
 		}
 		return &notificationResponse.ID, nil
 
+	}
+	return nil, nil
+}
 
 // DeleteNotification deletes notification
 func (na *Adapter) DeleteNotification(appID string, orgID string, id string) error {
