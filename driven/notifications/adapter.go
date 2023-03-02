@@ -11,6 +11,7 @@ import (
 	"github.com/rokwire/core-auth-library-go/v2/authservice"
 )
 
+// MessageRef implemetnts appID, orgID and ID
 type MessageRef struct {
 	OrgID string `json:"org_id" bson:"org_id"`
 	AppID string `json:"app_id" bson:"app_id"`
@@ -80,15 +81,15 @@ func (na *Adapter) sendNotification(recipients []model.NotificationRecipient, to
 		if resp.StatusCode != 200 {
 			log.Printf("SendNotification: error with response code - %d", resp.StatusCode)
 			return nil, fmt.Errorf("SendNotification:error with response code != 200")
-		} else {
-			var notificationResponse MessageRef
-			err := json.NewDecoder(resp.Body).Decode(&notificationResponse)
-			if err != nil {
-				log.Printf("SendNotification: error with response code - %d", resp.StatusCode)
-				return nil, fmt.Errorf("SendNotification: %s", err)
-			}
-			return &notificationResponse.ID, nil
 		}
+		var notificationResponse MessageRef
+		err = json.NewDecoder(resp.Body).Decode(&notificationResponse)
+		if err != nil {
+			log.Printf("SendNotification: error with response code - %d", resp.StatusCode)
+			return nil, fmt.Errorf("SendNotification: %s", err)
+		}
+		return &notificationResponse.ID, nil
+
 	}
 	return nil, nil
 }

@@ -65,6 +65,11 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			"entity_id":   todo.ID,
 			"entity_name": todo.Title,
 		})
+		if err != nil {
+			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
+			return err
+		}
+		log.Printf("Sent notification %s successfully", todo.ID)
 
 		reminderDateTime := todo.ReminderDateTime.Unix()
 		reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &reminderDateTime, map[string]string{
@@ -78,9 +83,9 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 		if err != nil {
 			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 			return err
-		} else {
-			log.Printf("Sent notification %s successfully", todo.ID)
 		}
+		log.Printf("Sent notification %s successfully", todo.ID)
+
 		messageIDs := model.MessageIDs{ReminderDateMessageID: reminderMsg, DueDateMessageID: duoMsg}
 
 		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
@@ -106,7 +111,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 				log.Printf("Error on delete notification")
 				return err
 			}
-			topic := "update due date time"
+			topic := "update todo entry"
 			dueDateTime := todo.DueDateTime.Unix()
 			duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &dueDateTime, map[string]string{
 				"type":        "wellness_todo_entry",
@@ -115,13 +120,18 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 				"entity_id":   todo.ID,
 				"entity_name": todo.Title,
 			})
+			if err != nil {
+				log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
+				return err
+			}
+			log.Printf("Sent notification %s successfully", todo.ID)
 			todo.MessageIDs.DueDateMessageID = duoMsg
 			if err != nil {
 				log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 				return err
-			} else {
-				log.Printf("Sent notification %s successfully", todo.ID)
 			}
+			log.Printf("Sent notification %s successfully", todo.ID)
+
 		}
 
 		if todoEntry.ReminderDateTime != todo.ReminderDateTime && todoEntry.MessageIDs.ReminderDateMessageID != nil {
@@ -143,9 +153,9 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			if err != nil {
 				log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 				return err
-			} else {
-				log.Printf("Sent notification %s successfully", todo.ID)
 			}
+			log.Printf("Sent notification %s successfully", todo.ID)
+
 		}
 
 		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
@@ -183,9 +193,9 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			if err != nil {
 				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
 				return err
-			} else {
-				log.Printf("Sent notification %s successfully", todoEntry.ID)
 			}
+			log.Printf("Sent notification %s successfully", todoEntry.ID)
+
 		}
 
 		if todoEntry.ReminderDateTime != nil && todoEntry.MessageIDs.ReminderDateMessageID != nil {
@@ -206,9 +216,9 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			if err != nil {
 				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
 				return err
-			} else {
-				log.Printf("Sent notification %s successfully", todoEntry.ID)
 			}
+			log.Printf("Sent notification %s successfully", todoEntry.ID)
+
 		}
 
 		err = app.storage.DeleteTodoEntry(appID, orgID, userID, id)
