@@ -186,15 +186,15 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			}
 			topic := "delete due date time"
 			dueDateTime := todoEntry.DueDateTime.Unix()
-			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, todoEntry.AppID, todoEntry.OrgID, &dueDateTime, map[string]string{
+			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, appID, orgID, &dueDateTime, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
-				"entity_id":   todoEntry.ID,
+				"entity_id":   id,
 				"entity_name": todoEntry.Title,
 			})
 			if err != nil {
-				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
+				log.Printf("Error on sending notification %s inbox message: %s", id, err)
 				return err
 			}
 			log.Printf("Sent notification %s successfully", todoEntry.ID)
@@ -209,15 +209,15 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 			}
 			topic := "delete reminder date time"
 			reminderDateTime := todoEntry.ReminderDateTime.Unix()
-			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, todoEntry.AppID, todoEntry.OrgID, &reminderDateTime, map[string]string{
+			_, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todoEntry.Title, appID, orgID, &reminderDateTime, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
-				"entity_id":   todoEntry.ID,
+				"entity_id":   id,
 				"entity_name": todoEntry.Title,
 			})
 			if err != nil {
-				log.Printf("Error on sending notification %s inbox message: %s", todoEntry.ID, err)
+				log.Printf("Error on sending notification %s inbox message: %s", id, err)
 				return err
 			}
 			log.Printf("Sent notification %s successfully", todoEntry.ID)
