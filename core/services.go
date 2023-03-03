@@ -58,7 +58,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		topic := "create todo entry"
 		dueDateTime := todo.DueDateTime.Unix()
-		duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &dueDateTime, map[string]string{
+		duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
@@ -72,9 +72,8 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 		}
 		log.Printf("Sent notification %s successfully", todo.ID)
 
-
 		reminderDateTime := todo.ReminderDateTime.Unix()
-		reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: todo.UserID}}, &topic, "TODO Reminder", todo.Title, todo.AppID, todo.OrgID, &reminderDateTime, map[string]string{
+		reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
