@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2023-03-04
+### Fixed
+= Fix create, update and delete todo entry api's [#17](https://github.com/rokwire/wellness-building-block/issues/17)
+
 ## [1.2.0] - 2023-03-01
 ### Fixed
 - Use scheduled notification instead of timer[#10](https://github.com/rokwire/wellness-building-block/issues/10)
