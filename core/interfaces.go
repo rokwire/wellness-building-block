@@ -160,6 +160,7 @@ type Storage interface {
 	GetTodoEntriesWithCurrentReminderTime(context storage.TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntriesWithCurrentDueTime(context storage.TransactionContext, dueTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
+	GetTodoEntriesForMigration() ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, messageIDs model.MessageIDs) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error)

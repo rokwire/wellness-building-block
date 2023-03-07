@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.2] - 2023-03-04
+## [1.2.4] - 2023-03-07
 ### Fixed
 = Fix create, update and delete todo entry api's [#17](https://github.com/rokwire/wellness-building-block/issues/17)
 
