@@ -264,7 +264,7 @@ func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]
 	return result, nil
 }
 
-// GetTodoEntries gets user's todo entries
+// GetTodoEntriesForMigration gets all todo entries
 func (sa *Adapter) GetTodoEntriesForMigration() ([]model.TodoEntry, error) {
 	filter := bson.D{}
 

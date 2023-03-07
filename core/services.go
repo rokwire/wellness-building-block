@@ -302,6 +302,7 @@ func (app *Application) processReminders() error {
 	})
 }
 
+//MigrateMessageIDs migrate message ids
 func (app *Application) MigrateMessageIDs() error {
 	transaction := func(context storage.TransactionContext) error {
 		todoEntries, err := app.storage.GetTodoEntriesForMigration()
