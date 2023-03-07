@@ -148,11 +148,11 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 				return err
 			}
 		}
-		if todo.DueDateTime != nil {
-			if todoEntry.DueDateTime != todo.DueDateTime {
+		if todo.ReminderDateTime != nil {
+			if todoEntry.ReminderDateTime != todo.ReminderDateTime {
 				topic := "update due date time"
-				dueDateTime := todo.DueDateTime.Unix()
-				duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
+				reminderDateTime := todo.ReminderDateTime.Unix()
+				reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -166,7 +166,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 				}
 				log.Printf("Sent notification %s successfully", id)
 
-				todo.MessageIDs.DueDateMessageID = duoMsg
+				todo.MessageIDs.ReminderDateMessageID = reminderMsg
 				if err != nil {
 					log.Printf("Error on sending notification %s inbox message: %s", id, err)
 					return err
@@ -300,7 +300,27 @@ func (app *Application) processReminders() error {
 
 		return nil
 	})
+}
 
+func (app *Application) MigrateMessageIDs() error {
+	transaction := func(context storage.TransactionContext) error {
+		todoEntries, err := app.storage.GetTodoEntriesForMigration()
+		if err != nil {
+			log.Printf("error on getting todo entries - %s", err)
+		}
+
+		for _, todo := range todoEntries {
+			if todo.MessageIDs.DueDateMessageID == nil || todo.MessageIDs.ReminderDateMessageID == nil {
+				_, err := app.updateTodoEntry(todo.AppID, todo.OrgID, todo.UserID, &todo, todo.ID)
+				if err != nil {
+					log.Printf("error on updating todo entries - %s", err)
+				}
+
+			}
+		}
+		return nil
+	}
+	return app.storage.PerformTransaction(transaction)
 }
 
 func (app *Application) getRings(appID string, orgID string, userID string) ([]model.Ring, error) {

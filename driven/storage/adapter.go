@@ -39,6 +39,7 @@ type Adapter struct {
 
 // Start starts the storage
 func (sa *Adapter) Start() error {
+
 	err := sa.db.start()
 	return err
 }
@@ -254,6 +255,18 @@ func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "user_id", Value: userID},
 	}
+
+	var result []model.TodoEntry
+	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// GetTodoEntries gets user's todo entries
+func (sa *Adapter) GetTodoEntriesForMigration() ([]model.TodoEntry, error) {
+	filter := bson.D{}
 
 	var result []model.TodoEntry
 	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
