@@ -16,10 +16,11 @@ package storage
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -223,6 +224,21 @@ func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
 		return err
 	}
 
+	err = entries.AddIndex(
+		bson.D{primitive.E{Key: "message_ids", Value: 1}},
+		false)
+	if err != nil {
+		return err
+	}
+	/*if ["messages_ids"] == nil {
+		err := entries.AddIndex(
+			bson.D{
+				primitive.E{Key: "user_id", Value: 1},
+			}, true)
+		if err != nil {
+			return err
+		}
+	}*/
 	log.Println("todo_entries passed")
 	return nil
 }

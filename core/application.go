@@ -57,6 +57,11 @@ func (app *Application) Start() {
 			}
 		}
 	}()
+
+	err := app.MigrateMessageIDs()
+	if err != nil {
+		log.Printf("error on migrate message ids - %s", err)
+	}
 }
 
 // NewApplication creates new Application
