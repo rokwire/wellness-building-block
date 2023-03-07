@@ -150,7 +150,6 @@ func (m *database) applyTodoCategoriesChecks(categories *collectionWrapper) erro
 
 func (m *database) applyTodoEntriesChecks(entries *collectionWrapper) error {
 	log.Println("apply todo_entries checks.....")
-	//tyrsene na todo entritata
 
 	err := entries.AddIndex(
 		bson.D{
