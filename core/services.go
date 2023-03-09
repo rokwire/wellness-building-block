@@ -19,6 +19,8 @@ import (
 	"time"
 	"wellness/core/model"
 	"wellness/driven/storage"
+
+	"github.com/google/uuid"
 )
 
 func (app *Application) getVersion() string {
@@ -55,6 +57,7 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 
 func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
 	var createTodoEntry *model.TodoEntry
+	entityID := uuid.NewString()
 	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		topic := "create todo entry"
 		dueDateTime := todo.DueDateTime.Unix()
@@ -62,7 +65,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
-			"entity_id":   todo.ID,
+			"entity_id":   entityID,
 			"entity_name": todo.Title,
 		})
 
@@ -70,14 +73,14 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 			return err
 		}
-		log.Printf("Sent notification %s successfully", todo.ID)
+		log.Printf("Sent notification %s successfully", entityID)
 
 		reminderDateTime := todo.ReminderDateTime.Unix()
 		reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
 			"type":        "wellness_todo_entry",
 			"operation":   "todo_reminder",
 			"entity_type": "wellness_todo_entry",
-			"entity_id":   todo.ID,
+			"entity_id":   entityID,
 			"entity_name": todo.Title,
 		})
 
@@ -85,11 +88,11 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Error on sending notification %s inbox message: %s", todo.ID, err)
 			return err
 		}
-		log.Printf("Sent notification %s successfully", todo.ID)
+		log.Printf("Sent notification %s successfully", entityID)
 
 		messageIDs := model.MessageIDs{ReminderDateMessageID: reminderMsg, DueDateMessageID: duoMsg}
 
-		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs)
+		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, messageIDs, entityID)
 		if err != nil {
 			log.Printf("Error on creating todo entry: %s", err)
 		}

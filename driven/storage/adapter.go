@@ -299,8 +299,8 @@ func (sa *Adapter) GetTodoEntry(appID string, orgID string, userID string, id st
 }
 
 // CreateTodoEntry create a todo entry
-func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry, messageIDs model.MessageIDs) (*model.TodoEntry, error) {
-	category.ID = uuid.NewString()
+func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, category *model.TodoEntry, messageIDs model.MessageIDs, entityID string) (*model.TodoEntry, error) {
+	category.ID = entityID
 	category.OrgID = orgID
 	category.AppID = appID
 	category.UserID = userID
