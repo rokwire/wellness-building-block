@@ -162,7 +162,7 @@ type Storage interface {
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
 	GetTodoEntriesForMigration() ([]model.TodoEntry, error)
 	GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
-	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, messageIDs model.MessageIDs) (*model.TodoEntry, error)
+	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, messageIDs model.MessageIDs, entityID string) (*model.TodoEntry, error)
 	UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error)
 	UpdateTodoEntriesTaskTime(context storage.TransactionContext, ids []string, taskTime time.Time) error
 	DeleteTodoEntry(appID string, orgID string, userID string, id string) error
