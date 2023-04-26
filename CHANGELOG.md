@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2023-04-26
+### Fixed
+- Fixed create ToDo entry does not work [#26](https://github.com/rokwire/wellness-building-block/issues/26)
+
 ## [1.2.5] - 2023-03-09
 ### Fixed
 - Fix create todo entry [#23](https://github.com/rokwire/wellness-building-block/issues/23)

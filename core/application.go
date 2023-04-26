@@ -17,7 +17,6 @@ package core
 import (
 	"log"
 	"sync"
-	"time"
 )
 
 // Application represents the core application code based on hexagonal architecture
@@ -35,29 +34,10 @@ type Application struct {
 	//TODO - remove this when applied to all environemnts
 	multiTenancyAppID string
 	multiTenancyOrgID string
-
-	scheduleTicker *time.Ticker
 }
 
 // Start starts the core part of the application
 func (app *Application) Start() {
-	app.scheduleTicker = time.NewTicker(1 * time.Minute)
-
-	quit := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-app.scheduleTicker.C:
-				log.Println("Scheduler tick")
-				app.processReminders()
-			case <-quit:
-				app.scheduleTicker.Stop()
-				log.Println("Scheduler ticker - stopped")
-				return
-			}
-		}
-	}()
-
 	err := app.MigrateMessageIDs()
 	if err != nil {
 		log.Printf("error on migrate message ids - %s", err)
