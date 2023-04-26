@@ -266,7 +266,18 @@ func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]
 
 // GetTodoEntriesForMigration gets all todo entries
 func (sa *Adapter) GetTodoEntriesForMigration() ([]model.TodoEntry, error) {
-	filter := bson.D{}
+	filter := bson.D{
+		bson.E{Key: "$or", Value: []bson.M{
+			{"$and": []bson.M{
+				{"message_ids.due_date_message_id": nil},
+				{"due_date_time": bson.M{"$gt": time.Now()}},
+			}},
+			{"$and": []bson.M{
+				{"message_ids.reminder_date_message_id": nil},
+				{"reminder_date_time": bson.M{"$gt": time.Now()}},
+			}},
+		}},
+	}
 
 	var result []model.TodoEntry
 	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})

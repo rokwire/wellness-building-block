@@ -58,6 +58,12 @@ type TodoEntry struct {
 	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
 } // @name TodoEntry
 
+// RequiresMessageIDsMigration Checks if the record requires db data migration
+func (t *TodoEntry) RequiresMessageIDsMigration() bool {
+	return (t.DueDateTime != nil && time.Now().Before(*t.DueDateTime) && t.MessageIDs.DueDateMessageID == nil) ||
+		(t.ReminderDateTime != nil && time.Now().Before(*t.ReminderDateTime) && t.MessageIDs.ReminderDateMessageID == nil)
+}
+
 // MessageIDs is used to collect due and reminder time messages
 type MessageIDs struct {
 	ReminderDateMessageID *string `json:"reminder_date_message_id" bson:"reminder_date_message_id"`
