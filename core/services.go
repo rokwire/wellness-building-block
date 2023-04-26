@@ -113,7 +113,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 		if todoEntry.MessageIDs.DueDateMessageID != nil {
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
 			if err != nil {
-				log.Printf("Error on delete notification with DueDateMessageID %s", todoEntry.MessageIDs.DueDateMessageID)
+				log.Printf("Error on delete notification with DueDateMessageID %s", *todoEntry.MessageIDs.DueDateMessageID)
 				//return err // Don't propagate the error. Just create the reminder.
 			}
 		}
@@ -142,7 +142,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 		if todoEntry.MessageIDs.ReminderDateMessageID != nil {
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
 			if err != nil {
-				log.Printf("Error on delete notification with ReminderDateMessageID %s", todoEntry.MessageIDs.ReminderDateMessageID)
+				log.Printf("Error on delete notification with ReminderDateMessageID %s", *todoEntry.MessageIDs.ReminderDateMessageID)
 				//return err // Don't propagate the error. Just create the reminder.
 			}
 		}
