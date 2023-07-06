@@ -30,6 +30,9 @@ WELLNESS_HOST | < url > | yes | URL where this application is being hosted
 WELLNESS_CORE_BB_HOST | < url > | yes | Core BB host URL
 WELLNESS_SERVICE_URL | < url > | yes | URL where this application is being hosted
 INTERNAL_API_KEY | < string > | yes | Internal API key for invocation by other BBs
+WELLNESS_PRIV_KEY | < string > | yes | PEM encoded private key for Wellness BB
+NOTIFICATIONS_BASE_URL | < url > | yes | Notifications BB host URL
+WELLNESS_SERVICE_ACCOUNT_ID | < string > | yes | ID of Service Account for Wellness BB
 
 ### Run Application
 
