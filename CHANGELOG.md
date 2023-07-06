@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Prepare for deployment in OpenShift [#31](https://github.com/rokwire/wellness-building-block/issues/31)
 ## [1.3.0] - 2023-04-26
 ### Changed
 - Updated Docker file (use alpine:3.17) 
