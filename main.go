@@ -44,6 +44,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/rokwire/core-auth-library-go/v2/authservice"
 	"github.com/rokwire/core-auth-library-go/v2/sigauth"
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 var (
@@ -59,6 +60,16 @@ func main() {
 	}
 
 	port := getEnvKey("PORT", true)
+	if len(port) == 0 {
+		port = "80"
+	}
+
+	serviceID := "wellness"
+	loggerOpts := logs.LoggerOpts{
+		SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version"),
+		SensitiveHeaders: []string{"Internal-Api-Key"},
+	}
+	logger := logs.NewLogger(serviceID, &loggerOpts)
 
 	internalAPIKey := getEnvKey("INTERNAL_API_KEY", true)
 
@@ -139,7 +150,7 @@ func main() {
 		InternalAPIKey: internalAPIKey,
 	}
 
-	webAdapter := driver.NewWebAdapter(host, port, application, config, serviceRegManager)
+	webAdapter := driver.NewWebAdapter(host, port, application, config, serviceRegManager, logger)
 
 	webAdapter.Start()
 }
