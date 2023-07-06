@@ -1,0 +1,19 @@
+{
+    "app_secret": {
+        "WELLNESS_MONGO_AUTH": "<mongo auth url>",
+        "INTERNAL_API_KEY": "<internal api key>",
+        "WELLNESS_PRIV_KEY": "<service account priv key>"
+    },
+    "app_config":{
+        "PORT": "5000",
+        "WELLNESS_MONGO_DATABASE": "<mongo database>",
+        "WELLNESS_MONGO_TIMEOUT": "",
+        "WELLNESS_MULTI_TENANCY_APP_ID": "<multi tenancy app id>",
+        "WELLNESS_MULTI_TENANCY_ORG_ID": "<multi tenancy org id>",
+        "NOTIFICATIONS_BASE_URL": "<notifications base url",
+        "WELLNESS_SERVICE_ACCOUNT_ID": "<service account id>",
+        "WELLNESS_HOST": "<host>",
+        "WELLNESS_CORE_BB_HOST": "<core bb host>",
+        "WELLNESS_SERVICE_URL": "<service url>"
+    }
+}
