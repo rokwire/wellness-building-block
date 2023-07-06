@@ -21,9 +21,9 @@ import (
 	"wellness/core"
 	"wellness/core/model"
 	"wellness/driver/web/rest"
-	"wellness/utils"
 
 	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/logging-library-go/v2/logs"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
@@ -41,6 +41,8 @@ type Adapter struct {
 	internalApisHandler rest.InternalApisHandler
 
 	app *core.Application
+
+	logger *logs.Logger
 }
 
 // @title Rokwire Wellness Building Block API
@@ -129,9 +131,11 @@ func (we Adapter) serveDocUI() http.Handler {
 
 func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
 
+		logObj := we.logger.NewRequestLog(req)
+		logObj.RequestReceived()
 		handler(w, req)
+		logObj.RequestComplete()
 	}
 }
 
@@ -139,8 +143,8 @@ type coreAuthFunc = func(*tokenauth.Claims, http.ResponseWriter, *http.Request)
 
 func (we Adapter) coreAuthWrapFunc(handler coreAuthFunc, authorization Authorization) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
-
+		logObj := we.logger.NewRequestLog(req)
+		logObj.RequestReceived()
 		responseStatus, claims, err := authorization.check(req)
 		if err != nil {
 			log.Printf("error authorization check - %s", err)
@@ -148,6 +152,7 @@ func (we Adapter) coreAuthWrapFunc(handler coreAuthFunc, authorization Authoriza
 			return
 		}
 		handler(claims, w, req)
+		logObj.RequestComplete()
 	}
 }
 
@@ -155,7 +160,8 @@ type internalAuthFunc = func(http.ResponseWriter, *http.Request)
 
 func (we Adapter) internalAuthWrapFunc(handler internalAuthFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
+		logObj := we.logger.NewRequestLog(req)
+		logObj.RequestReceived()
 
 		status, err := we.auth.internalAuth.check(req)
 		if err != nil {
@@ -165,18 +171,19 @@ func (we Adapter) internalAuthWrapFunc(handler internalAuthFunc) http.HandlerFun
 		}
 
 		handler(w, req)
+		logObj.RequestComplete()
 	}
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) Adapter {
+func NewWebAdapter(host string, port string, app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
 	auth := NewAuth(app, config, serviceRegManager)
 
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
 	internalApisHandler := rest.NewInternalApisHandler(app)
 	return Adapter{host: host, port: port, auth: auth, apisHandler: apisHandler, adminApisHandler: adminApisHandler,
-		internalApisHandler: internalApisHandler, app: app}
+		internalApisHandler: internalApisHandler, app: app, logger: logger}
 }
 
 // AppListener implements core.ApplicationListener interface
