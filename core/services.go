@@ -94,10 +94,25 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Sent ReminderDateTime notification %s successfully", entityID)
 		}
 
+		if todo.RecurrenceID != nil && !todo.Completed {
+			err = app.storage.UpdateTodoEntriesRecurringIds(appID, orgID, userID, todo, entityID)
+			if err != nil {
+				log.Printf("Error on updating todo entries recurrings ids: %s", err)
+			}
+
+			err = app.storage.UpdateTodoEntryRecurringId(appID, orgID, userID, todo, entityID)
+			if err != nil {
+				log.Printf("Error on updating todo entry recurrings ids: %s", err)
+			}
+			
+			todo.RecurrenceID = nil
+		}
+
 		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
 		if err != nil {
 			log.Printf("Error on creating todo entry: %s", err)
 		}
+
 		return nil
 	})
 	return createTodoEntry, err
@@ -167,64 +182,11 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 				log.Printf("Sent ReminderDateTime notification %s successfully", id)
 			}
 		}
-		
 
-		//TODO figure out how we should handle date changes that are not time related for recurring tasks
-		if todoEntry.DueDateTime.Hour() != todo.DueDateTime.Hour() || todoEntry.DueDateTime.Minute() != todo.DueDateTime.Minute(){
+		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		if err != nil {
+			log.Printf("Error on updating todo entry: %s", err)
 
-			if todo.RecurrenceID == nil {
-				updateTodoEntry, err = app.createTodoEntry(appID, orgID, userID, todo)
-				if err != nil {
-					log.Printf("Error on creating recurring todo entry: %s", err)
-				}
-
-				//update old main recurrence record with with recurrence id
-				err = app.storage.UpdateRecurringTodoEntry(appID, orgID, userID, updateTodoEntry, id)
-				if err != nil {
-					log.Printf("Error on updating first recurring todo entry: %s", err)
-				}
-
-				//update all previous recurrence ids to new one and data
-				err = app.storage.UpdateRecurringTodoEntries(appID, orgID, userID, updateTodoEntry, id, todoEntry)
-				if err != nil {
-					log.Printf("Error on updating recurring todo entries: %s", err)
-				}
-
-			}else{
-				//TODO handle change when previous todo recurring date is modified
-				// // recurrenceId := todo.RecurrenceID
-				// todo.RecurrenceID = nil
-				// updateTodoEntry, err = app.createTodoEntry(appID, orgID, userID, todo)
-				// if err != nil {
-				// 	log.Printf("Error on creating recurring todo entry: %s", err)
-				// }
-
-				// //update old main recurrence record with with recurrence id
-				// err = app.storage.UpdateRecurringTodoEntry(appID, orgID, userID, updateTodoEntry, updateTodoEntry.ID)
-				// if err != nil {
-				// 	log.Printf("Error on updating first recurring todo entry: %s", err)
-				// }
-
-				// //update all previous recurrence ids to new one
-				// err = app.storage.UpdateRecurringTodoEntries(appID, orgID, userID, updateTodoEntry, updateTodoEntry.ID, nil)
-				// if err != nil {
-				// 	log.Printf("Error on updating recurring todo entries: %s", err)
-				// }
-
-			}
-
-
-		}else{
-			updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
-			if err != nil {
-				log.Printf("Error on updating todo entry: %s", err)
-			}
-
-			// //update all previous recurrence ids to new one
-			// 	err = app.storage.UpdateRecurringTodoEntries(appID, orgID, userID, updateTodoEntry, updateTodoEntry.ID, nil)
-			// 	if err != nil {
-			// 		log.Printf("Error on updating recurring todo entries: %s", err)
-			// }
 		}
 
 		return nil

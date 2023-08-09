@@ -360,75 +360,29 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 	return sa.GetTodoEntry(appID, orgID, userID, id)
 }
 
-// UpdateRecurringTodoEntries updates any completed recurring todo entries
-func (sa *Adapter) UpdateRecurringTodoEntries(appID string, orgID string, userID string, todo *model.TodoEntry, id string, oldTodo *model.TodoEntry) error {
+// UpdateTodoEntriesRecurringIds updates any completed recurring todo entries
+func (sa *Adapter) UpdateTodoEntriesRecurringIds(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID}}
-	if oldTodo != nil {
-		filter = append(filter, primitive.E{Key: "recurrence_id", Value: oldTodo.ID})
+
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "recurrence_id", Value: id},
+		}},
 	}
-	// else {
-	// 	filter = append(filter, primitive.E{Key: "recurrence_id", Value: todo.ID})
-	// }
-
-	if oldTodo != nil {
-		update := bson.D{
-			primitive.E{Key: "$set", Value: bson.D{
-				primitive.E{Key: "title", Value: todo.Title},
-				primitive.E{Key: "description", Value: todo.Description},
-				primitive.E{Key: "category", Value: todo.Category},
-				primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
-				primitive.E{Key: "reminder_type", Value: todo.ReminderType},
-				primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
-				primitive.E{Key: "work_days", Value: todo.WorkDays},
-				primitive.E{Key: "task_time", Value: todo.TaskTime},
-				primitive.E{Key: "message_ids", Value: todo.MessageIDs},
-				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
-				primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
-				primitive.E{Key: "recurrence_id", Value: todo.ID},
-			}},
-		}
-		_, err := sa.db.todoEntries.UpdateMany(filter, update, nil)
-		if err != nil {
-			log.Printf("error updating user defined todo entry: %s", err)
-			return err
-		}
-	} else {
-		update := bson.D{
-			primitive.E{Key: "$set", Value: bson.D{
-				primitive.E{Key: "title", Value: todo.Title},
-				primitive.E{Key: "description", Value: todo.Description},
-				primitive.E{Key: "category", Value: todo.Category},
-				primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
-				primitive.E{Key: "reminder_type", Value: todo.ReminderType},
-				primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
-				primitive.E{Key: "work_days", Value: todo.WorkDays},
-				primitive.E{Key: "task_time", Value: todo.TaskTime},
-				primitive.E{Key: "message_ids", Value: todo.MessageIDs},
-				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
-				primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
-				primitive.E{Key: "recurrence_id", Value: todo.ID},
-			}},
-		}
-
-		_, err := sa.db.todoEntries.UpdateMany(filter, update, nil)
-		if err != nil {
-			log.Printf("error updating user defined todo entry: %s", err)
-			return err
-		}
+	_, err := sa.db.todoEntries.UpdateMany(filter, update, nil)
+	if err != nil {
+		log.Printf("error updating user defined todo entry: %s", err)
+		return err
 	}
-
-	// if oldTodo != nil {
-	// 	update = append(update, primitive.E{Key: "recurrence_id", Value: todo.ID})
-	// }
 
 	return nil
 
 }
 
-func (sa *Adapter) UpdateRecurringTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
+func (sa *Adapter) UpdateTodoEntryRecurringId(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
 
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
@@ -439,17 +393,6 @@ func (sa *Adapter) UpdateRecurringTodoEntry(appID string, orgID string, userID s
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
 			primitive.E{Key: "recurrence_id", Value: id},
-			primitive.E{Key: "title", Value: todo.Title},
-			primitive.E{Key: "description", Value: todo.Description},
-			primitive.E{Key: "category", Value: todo.Category},
-			primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
-			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
-			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
-			primitive.E{Key: "work_days", Value: todo.WorkDays},
-			primitive.E{Key: "task_time", Value: todo.TaskTime},
-			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
-			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
-			primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
 		}},
 	}
 
