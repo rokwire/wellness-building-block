@@ -241,8 +241,30 @@ func (h ApisHandler) DeleteUserTodoCategory(claims *tokenauth.Claims, w http.Res
 // @Security UserAuth
 // @Router  /api/user/todo_entries [get]
 func (h ApisHandler) GetUserTodoEntries(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	var err error
 
-	resData, err := h.app.Services.GetTodoEntries(claims.AppID, claims.OrgID, claims.Subject)
+	limitRaw := r.URL.Query().Get("limit")
+	limit := 20
+	if len(limitRaw) > 0 {
+		intParsed, err := strconv.Atoi(limitRaw)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		limit = intParsed
+	}
+
+	offset := 0
+	offsetArg := r.URL.Query().Get("offset")
+	if offsetArg != "" {
+		offset, err = strconv.Atoi(offsetArg)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	resData, err := h.app.Services.GetTodoEntries(claims.AppID, claims.OrgID, claims.Subject, limit, offset)
 	if err != nil {
 		log.Printf("Error on getting user todo entries - %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -56,6 +56,8 @@ type TodoEntry struct {
 	TaskTime         *time.Time   `json:"task_time" bson:"task_time"`
 	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
 	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
+	RecurrenceType   *string      `json:"recurrence_type" bson:"recurrence_type"`
+	RecurrenceID     *string      `json:"recurrence_id" bson:"recurrence_id"`
 } // @name TodoEntry
 
 // RequiresMessageIDsMigration Checks if the record requires db data migration

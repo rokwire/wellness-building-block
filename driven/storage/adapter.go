@@ -249,7 +249,7 @@ func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string,
 }
 
 // GetTodoEntries gets user's todo entries
-func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error) {
+func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string, limit int, offset int) ([]model.TodoEntry, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "app_id", Value: appID},
@@ -257,7 +257,7 @@ func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]
 	}
 
 	var result []model.TodoEntry
-	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"due_date_time", 1}}})
 	if err != nil {
 		return nil, err
 	}
@@ -347,6 +347,8 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "task_time", Value: todo.TaskTime},
 			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+			primitive.E{Key: "recurrence_id", Value: todo.RecurrenceID},
+			primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
 		}},
 	}
 	_, err := sa.db.todoEntries.UpdateOne(filter, update, nil)
@@ -356,6 +358,108 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 	}
 
 	return sa.GetTodoEntry(appID, orgID, userID, id)
+}
+
+// UpdateRecurringTodoEntries updates any completed recurring todo entries
+func (sa *Adapter) UpdateRecurringTodoEntries(appID string, orgID string, userID string, todo *model.TodoEntry, id string, oldTodo *model.TodoEntry) error {
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID}}
+	if oldTodo != nil {
+		filter = append(filter, primitive.E{Key: "recurrence_id", Value: oldTodo.ID})
+	}
+	// else {
+	// 	filter = append(filter, primitive.E{Key: "recurrence_id", Value: todo.ID})
+	// }
+
+	if oldTodo != nil {
+		update := bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "title", Value: todo.Title},
+				primitive.E{Key: "description", Value: todo.Description},
+				primitive.E{Key: "category", Value: todo.Category},
+				primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
+				primitive.E{Key: "reminder_type", Value: todo.ReminderType},
+				primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
+				primitive.E{Key: "work_days", Value: todo.WorkDays},
+				primitive.E{Key: "task_time", Value: todo.TaskTime},
+				primitive.E{Key: "message_ids", Value: todo.MessageIDs},
+				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+				primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
+				primitive.E{Key: "recurrence_id", Value: todo.ID},
+			}},
+		}
+		_, err := sa.db.todoEntries.UpdateMany(filter, update, nil)
+		if err != nil {
+			log.Printf("error updating user defined todo entry: %s", err)
+			return err
+		}
+	} else {
+		update := bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "title", Value: todo.Title},
+				primitive.E{Key: "description", Value: todo.Description},
+				primitive.E{Key: "category", Value: todo.Category},
+				primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
+				primitive.E{Key: "reminder_type", Value: todo.ReminderType},
+				primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
+				primitive.E{Key: "work_days", Value: todo.WorkDays},
+				primitive.E{Key: "task_time", Value: todo.TaskTime},
+				primitive.E{Key: "message_ids", Value: todo.MessageIDs},
+				primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+				primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
+				primitive.E{Key: "recurrence_id", Value: todo.ID},
+			}},
+		}
+
+		_, err := sa.db.todoEntries.UpdateMany(filter, update, nil)
+		if err != nil {
+			log.Printf("error updating user defined todo entry: %s", err)
+			return err
+		}
+	}
+
+	// if oldTodo != nil {
+	// 	update = append(update, primitive.E{Key: "recurrence_id", Value: todo.ID})
+	// }
+
+	return nil
+
+}
+
+func (sa *Adapter) UpdateRecurringTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
+
+	filter := bson.D{
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "user_id", Value: userID},
+		primitive.E{Key: "_id", Value: id}}
+
+	update := bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "recurrence_id", Value: id},
+			primitive.E{Key: "title", Value: todo.Title},
+			primitive.E{Key: "description", Value: todo.Description},
+			primitive.E{Key: "category", Value: todo.Category},
+			primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
+			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
+			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
+			primitive.E{Key: "work_days", Value: todo.WorkDays},
+			primitive.E{Key: "task_time", Value: todo.TaskTime},
+			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
+			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+			primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
+		}},
+	}
+
+	_, err := sa.db.todoEntries.UpdateOne(filter, update, nil)
+	if err != nil {
+		log.Printf("error updating user defined todo entry: %s", err)
+		return err
+	}
+
+	return nil
 }
 
 // DeleteTodoEntry deletes a todo entry
