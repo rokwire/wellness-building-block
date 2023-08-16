@@ -16,6 +16,7 @@ package core
 
 import (
 	"log"
+	"time"
 	"wellness/core/model"
 	"wellness/driven/storage"
 
@@ -94,23 +95,32 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Sent ReminderDateTime notification %s successfully", entityID)
 		}
 
-		if todo.RecurrenceID != nil && !todo.Completed {
-			err = app.storage.UpdateTodoEntriesRecurringIds(appID, orgID, userID, todo, entityID)
+		if todo.RecurrenceID != nil {
+			todoRecurrence, err := app.storage.GetTodoEntry(appID, orgID, userID, *todo.RecurrenceID)
 			if err != nil {
-				log.Printf("Error on updating todo entries recurrings ids: %s", err)
+				log.Printf("Error on getting todo entry: %s", err)
 			}
 
-			err = app.storage.UpdateTodoEntryRecurringId(appID, orgID, userID, todo, entityID)
-			if err != nil {
-				log.Printf("Error on updating todo entry recurrings ids: %s", err)
-			}
-			
-			todo.RecurrenceID = nil
-		}
+			log.Printf("%s", *todo.DueDateTime)
+			log.Printf("%s", *todo.DueDateTime)
+			hour, minute, _ := todo.DueDateTime.Clock()
+			oldHour, oldMinute, _ := todoRecurrence.DueDateTime.Clock()
 
-		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
-		if err != nil {
-			log.Printf("Error on creating todo entry: %s", err)
+			if *todo.RecurrenceType != *todoRecurrence.RecurrenceType || oldHour != hour || oldMinute != minute {
+				t := time.Date(todoRecurrence.DueDateTime.Day(), todoRecurrence.DueDateTime.Month(), todoRecurrence.DueDateTime.Day(), todo.DueDateTime.Hour(), todo.DueDateTime.Minute(), 0, 0, time.UTC)
+				todo.DueDateTime = &t
+				err := app.storage.UpdateTodoEntryRecurrence(appID, orgID, userID, todo, todoRecurrence.ID)
+				if err != nil {
+					log.Printf("Error on updating todo entry: %s", err)
+
+				}
+			}
+		} else {
+
+			createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
+			if err != nil {
+				log.Printf("Error on creating todo entry: %s", err)
+			}
 		}
 
 		return nil

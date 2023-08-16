@@ -50,6 +50,7 @@ type TodoEntry struct {
 	Completed        bool         `json:"completed" bson:"completed"`
 	HasDueTime       bool         `json:"has_due_time" bson:"has_due_time"`
 	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
+	EndDateTime      *time.Time   `json:"end_date_time" bson:"end_date_time"`
 	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
 	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
 	MessageIDs       MessageIDs   `json:"message_ids" bson:"message_ids"`

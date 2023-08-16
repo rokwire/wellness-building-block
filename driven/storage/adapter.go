@@ -341,13 +341,14 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "completed", Value: todo.Completed},
 			primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
 			primitive.E{Key: "due_date_time", Value: todo.DueDateTime},
+			primitive.E{Key: "end_date_time", Value: todo.EndDateTime},
 			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
 			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
 			primitive.E{Key: "work_days", Value: todo.WorkDays},
 			primitive.E{Key: "task_time", Value: todo.TaskTime},
 			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
-			primitive.E{Key: "recurrence_id", Value: todo.RecurrenceID},
+			// primitive.E{Key: "recurrence_id", Value: todo.RecurrenceID},
 			primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
 		}},
 	}
@@ -382,7 +383,7 @@ func (sa *Adapter) UpdateTodoEntriesRecurringIds(appID string, orgID string, use
 
 }
 
-func (sa *Adapter) UpdateTodoEntryRecurringId(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
+func (sa *Adapter) UpdateTodoEntryRecurrence(appID string, orgID string, userID string, todo *model.TodoEntry, id string) error {
 
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
@@ -392,7 +393,21 @@ func (sa *Adapter) UpdateTodoEntryRecurringId(appID string, orgID string, userID
 
 	update := bson.D{
 		primitive.E{Key: "$set", Value: bson.D{
-			primitive.E{Key: "recurrence_id", Value: id},
+			primitive.E{Key: "title", Value: todo.Title},
+			primitive.E{Key: "description", Value: todo.Description},
+			primitive.E{Key: "category", Value: todo.Category},
+			primitive.E{Key: "completed", Value: todo.Completed},
+			primitive.E{Key: "has_due_time", Value: todo.HasDueTime},
+			primitive.E{Key: "due_date_time", Value: todo.DueDateTime},
+			primitive.E{Key: "end_date_time", Value: todo.EndDateTime},
+			primitive.E{Key: "reminder_type", Value: todo.ReminderType},
+			primitive.E{Key: "reminder_date_time", Value: todo.ReminderDateTime},
+			primitive.E{Key: "work_days", Value: todo.WorkDays},
+			primitive.E{Key: "task_time", Value: todo.TaskTime},
+			primitive.E{Key: "message_ids", Value: todo.MessageIDs},
+			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
+			primitive.E{Key: "recurrence_type", Value: todo.RecurrenceType},
+			primitive.E{Key: "due_date_time", Value: todo.DueDateTime},
 		}},
 	}
 
