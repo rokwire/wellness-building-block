@@ -114,6 +114,11 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 					log.Printf("Error on updating todo entry: %s", err)
 
 				}
+			}else{
+				createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
+				if err != nil {
+					log.Printf("Error on creating todo entry: %s", err)
+				}
 			}
 		} else {
 
