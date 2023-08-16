@@ -16,6 +16,7 @@ package core
 
 import (
 	"log"
+	"time"
 	"wellness/core/model"
 	"wellness/driven/storage"
 
@@ -46,8 +47,8 @@ func (app *Application) deleteTodoCategory(appID string, orgID string, userID st
 	return app.storage.DeleteTodoCategory(appID, orgID, userID, id)
 }
 
-func (app *Application) getTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error) {
-	return app.storage.GetTodoEntries(appID, orgID, userID)
+func (app *Application) getTodoEntries(appID string, orgID string, userID string, limit int, offset int) ([]model.TodoEntry, error) {
+	return app.storage.GetTodoEntries(appID, orgID, userID, limit, offset)
 }
 
 func (app *Application) getTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error) {
@@ -94,10 +95,39 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Sent ReminderDateTime notification %s successfully", entityID)
 		}
 
-		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
-		if err != nil {
-			log.Printf("Error on creating todo entry: %s", err)
+		if todo.RecurrenceID != nil {
+			todoRecurrence, err := app.storage.GetTodoEntry(appID, orgID, userID, *todo.RecurrenceID)
+			if err != nil {
+				log.Printf("Error on getting todo entry: %s", err)
+			}
+
+			log.Printf("%s", *todo.DueDateTime)
+			log.Printf("%s", *todo.DueDateTime)
+			hour, minute, _ := todo.DueDateTime.Clock()
+			oldHour, oldMinute, _ := todoRecurrence.DueDateTime.Clock()
+
+			if *todo.RecurrenceType != *todoRecurrence.RecurrenceType || oldHour != hour || oldMinute != minute {
+				t := time.Date(todoRecurrence.DueDateTime.Day(), todoRecurrence.DueDateTime.Month(), todoRecurrence.DueDateTime.Day(), todo.DueDateTime.Hour(), todo.DueDateTime.Minute(), 0, 0, time.UTC)
+				todo.DueDateTime = &t
+				err := app.storage.UpdateTodoEntryRecurrence(appID, orgID, userID, todo, todoRecurrence.ID)
+				if err != nil {
+					log.Printf("Error on updating todo entry: %s", err)
+
+				}
+			}else{
+				createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
+				if err != nil {
+					log.Printf("Error on creating todo entry: %s", err)
+				}
+			}
+		} else {
+
+			createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
+			if err != nil {
+				log.Printf("Error on creating todo entry: %s", err)
+			}
 		}
+
 		return nil
 	})
 	return createTodoEntry, err
@@ -171,6 +201,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
 		if err != nil {
 			log.Printf("Error on updating todo entry: %s", err)
+
 		}
 
 		return nil

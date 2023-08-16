@@ -50,12 +50,15 @@ type TodoEntry struct {
 	Completed        bool         `json:"completed" bson:"completed"`
 	HasDueTime       bool         `json:"has_due_time" bson:"has_due_time"`
 	DueDateTime      *time.Time   `json:"due_date_time" bson:"due_date_time"`
+	EndDateTime      *time.Time   `json:"end_date_time" bson:"end_date_time"`
 	ReminderType     string       `json:"reminder_type" bson:"reminder_type"`
 	ReminderDateTime *time.Time   `json:"reminder_date_time" bson:"reminder_date_time"`
 	MessageIDs       MessageIDs   `json:"message_ids" bson:"message_ids"`
 	TaskTime         *time.Time   `json:"task_time" bson:"task_time"`
 	DateCreated      time.Time    `json:"date_created" bson:"date_created"`
 	DateUpdated      *time.Time   `json:"date_updated" bson:"date_updated"`
+	RecurrenceType   *string      `json:"recurrence_type" bson:"recurrence_type"`
+	RecurrenceID     *string      `json:"recurrence_id" bson:"recurrence_id"`
 } // @name TodoEntry
 
 // RequiresMessageIDsMigration Checks if the record requires db data migration
