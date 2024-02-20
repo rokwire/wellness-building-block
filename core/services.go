@@ -51,7 +51,7 @@ func (app *Application) getTodoEntries(appID string, orgID string, userID string
 }
 
 func (app *Application) getTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error) {
-	return app.storage.GetTodoEntry(appID, orgID, userID, id)
+	return app.storage.GetTodoEntry(nil, appID, orgID, userID, id)
 }
 
 func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
@@ -106,7 +106,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
 	var updateTodoEntry *model.TodoEntry
 	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
+		todoEntry, err := app.storage.GetTodoEntry(context, appID, orgID, userID, id)
 		if err != nil {
 			log.Printf("Error on getting todo entry: %s", err)
 		}
@@ -114,7 +114,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.DueDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notification with DueDateMessageID %s", *todoEntry.MessageIDs.DueDateMessageID)
-				//return err // Don't propagate the error. Just create the reminder.
+				return err
 			}
 		}
 
@@ -143,7 +143,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			err = app.notifications.DeleteNotification(appID, orgID, *todoEntry.MessageIDs.ReminderDateMessageID)
 			if err != nil {
 				log.Printf("Error on delete notification with ReminderDateMessageID %s", *todoEntry.MessageIDs.ReminderDateMessageID)
-				//return err // Don't propagate the error. Just create the reminder.
+				return err
 			}
 		}
 		if todo.ReminderDateTime != nil {
@@ -160,7 +160,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 
 				if err != nil {
 					log.Printf("Error on sending ReminderDateTime notification %s inbox message: %s", id, err)
-					//return err // Don't propagate the error. Just create the reminder.
+					return err
 				}
 
 				todo.MessageIDs.ReminderDateMessageID = reminderMsg
@@ -168,9 +168,10 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			}
 		}
 
-		updateTodoEntry, err = app.storage.UpdateTodoEntry(appID, orgID, userID, todo, id)
+		updateTodoEntry, err = app.storage.UpdateTodoEntry(context, appID, orgID, userID, todo, id)
 		if err != nil {
 			log.Printf("Error on updating todo entry: %s", err)
+			return err
 		}
 
 		return nil
@@ -181,7 +182,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 func (app *Application) deleteTodoEntry(appID string, orgID string, userID string, id string) error {
 
 	return app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-		todoEntry, err := app.storage.GetTodoEntry(appID, orgID, userID, id)
+		todoEntry, err := app.storage.GetTodoEntry(context, appID, orgID, userID, id)
 		if err != nil {
 			log.Printf("Error on getting todo entry: %s", err)
 		}
@@ -199,7 +200,7 @@ func (app *Application) deleteTodoEntry(appID string, orgID string, userID strin
 				//return err // Don't propagate the error. Just create the reminder.
 			}
 		}
-		err = app.storage.DeleteTodoEntry(appID, orgID, userID, id)
+		err = app.storage.DeleteTodoEntry(context, appID, orgID, userID, id)
 		if err != nil {
 			log.Printf("Error on delete todo entry: %s", err)
 		}

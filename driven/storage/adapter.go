@@ -288,7 +288,7 @@ func (sa *Adapter) GetTodoEntriesForMigration() ([]model.TodoEntry, error) {
 }
 
 // GetTodoEntry get a single todo entry
-func (sa *Adapter) GetTodoEntry(appID string, orgID string, userID string, id string) (*model.TodoEntry, error) {
+func (sa *Adapter) GetTodoEntry(context TransactionContext, appID string, orgID string, userID string, id string) (*model.TodoEntry, error) {
 	filter := bson.D{
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "app_id", Value: appID},
@@ -297,7 +297,7 @@ func (sa *Adapter) GetTodoEntry(appID string, orgID string, userID string, id st
 	}
 
 	var result []model.TodoEntry
-	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	err := sa.db.todoEntries.FindWithContext(context, filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +326,7 @@ func (sa *Adapter) CreateTodoEntry(appID string, orgID string, userID string, ca
 }
 
 // UpdateTodoEntry updates a todo entry
-func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
+func (sa *Adapter) UpdateTodoEntry(context TransactionContext, appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
 
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
@@ -349,24 +349,25 @@ func (sa *Adapter) UpdateTodoEntry(appID string, orgID string, userID string, to
 			primitive.E{Key: "date_updated", Value: time.Now().UTC()},
 		}},
 	}
-	_, err := sa.db.todoEntries.UpdateOne(filter, update, nil)
+
+	_, err := sa.db.todoEntries.UpdateOneWithContext(context, filter, update, nil)
 	if err != nil {
 		log.Printf("error updating user defined todo entry: %s", err)
 		return nil, err
 	}
 
-	return sa.GetTodoEntry(appID, orgID, userID, id)
+	return sa.GetTodoEntry(nil, appID, orgID, userID, id)
 }
 
 // DeleteTodoEntry deletes a todo entry
-func (sa *Adapter) DeleteTodoEntry(appID string, orgID string, userID string, id string) error {
+func (sa *Adapter) DeleteTodoEntry(context TransactionContext, appID string, orgID string, userID string, id string) error {
 	filter := bson.D{
 		primitive.E{Key: "app_id", Value: appID},
 		primitive.E{Key: "org_id", Value: orgID},
 		primitive.E{Key: "user_id", Value: userID},
 		primitive.E{Key: "_id", Value: id}}
 
-	_, err := sa.db.todoEntries.DeleteOne(filter, nil)
+	_, err := sa.db.todoEntries.DeleteOneWithContext(context, filter, nil)
 	if err != nil {
 		log.Printf("error deleting todo entry: %s", err)
 		return err

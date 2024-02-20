@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Multiple notifications sent for single To-Do item [#36](https://github.com/rokwire/wellness-building-block/issues/36)
+
 ## [1.3.0] - 2023-04-26
 ### Changed
 - Updated Docker file (use alpine:3.17) 
