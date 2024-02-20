@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2024-02-20
 ### Fixed
 - Multiple notifications sent for single To-Do item [#36](https://github.com/rokwire/wellness-building-block/issues/36)
 
