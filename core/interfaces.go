@@ -156,6 +156,7 @@ type Storage interface {
 	CreateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	DeleteTodoCategory(appID string, orgID string, userID string, id string) error
+	DeleteTodoCategoriesForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetTodoEntriesWithCurrentReminderTime(context storage.TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntriesWithCurrentDueTime(context storage.TransactionContext, dueTime time.Time) ([]model.TodoEntry, error)

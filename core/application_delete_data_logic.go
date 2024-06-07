@@ -55,7 +55,7 @@ func (d deleteDataLogic) setupTimerForDelete() {
 	}
 
 	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
+	/*location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		d.logger.Errorf("Error getting location:%s\n", err.Error())
 	}
@@ -74,10 +74,10 @@ func (d deleteDataLogic) setupTimerForDelete() {
 		d.logger.Infof("setupTimerForDelete -> the delete process has already been processed today, so the first process will be tomorrow")
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+	} */
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	d.logger.Infof("setupTimerForDelete -> first call after %s", duration)
 
 	d.dailyDeleteTimer = time.NewTimer(duration)
@@ -147,26 +147,27 @@ func (d deleteDataLogic) processDelete() {
 
 func (d deleteDataLogic) deleteAppOrgUsersData(appID string, orgID string, accountsIDs []string) {
 
-	/*// delete the mesages recipients
-	err := d.storage.DeleteMessagesRecipientsForUsers(nil, appID, orgID, accountsIDs)
+	// delete the todo categories
+	err := d.storage.DeleteTodoCategoriesForUsers(appID, orgID, accountsIDs)
 	if err != nil {
-		d.logger.Errorf("error deleting the messages recipients for users - %s", err)
+		d.logger.Errorf("error deleting todo categories for users - %s", err)
 		return
 	}
+	/*
 
-	// delete the queue data items
-	err = d.storage.DeleteQueueDataForUsers(nil, appID, orgID, accountsIDs)
-	if err != nil {
-		d.logger.Errorf("error deleting the queue data items for users - %s", err)
-		return
-	}
+		// delete the queue data items
+		err = d.storage.DeleteQueueDataForUsers(nil, appID, orgID, accountsIDs)
+		if err != nil {
+			d.logger.Errorf("error deleting the queue data items for users - %s", err)
+			return
+		}
 
-	// delete the users
-	err = d.storage.DeleteUsersWithIDs(nil, appID, orgID, accountsIDs)
-	if err != nil {
-		d.logger.Errorf("error deleting the users - %s", err)
-		return
-	} */
+		// delete the users
+		err = d.storage.DeleteUsersWithIDs(nil, appID, orgID, accountsIDs)
+		if err != nil {
+			d.logger.Errorf("error deleting the users - %s", err)
+			return
+		} */
 }
 
 func (d deleteDataLogic) getAccountsIDs(memberships []model.DeletedMembership) []string {

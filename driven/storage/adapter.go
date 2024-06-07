@@ -248,6 +248,21 @@ func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string,
 	return nil
 }
 
+// DeleteTodoCategoriesForUsers the todo categories for users
+func (sa *Adapter) DeleteTodoCategoriesForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.todoCategories.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "todo category", nil, err)
+	}
+	return nil
+}
+
 // GetTodoEntries gets user's todo entries
 func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error) {
 	filter := bson.D{
