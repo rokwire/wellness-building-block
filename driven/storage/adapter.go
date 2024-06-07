@@ -822,6 +822,21 @@ func (sa *Adapter) DeleteRingsRecords(appID string, orgID string, userID string,
 	return nil
 }
 
+// DeleteRingsRecordsForUsers deletes a rings records for users
+func (sa *Adapter) DeleteRingsRecordsForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.ringsRecords.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "ring", nil, err)
+	}
+	return nil
+}
+
 func (sa *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
 	err := sessionContext.AbortTransaction(sessionContext)
 	if err != nil {

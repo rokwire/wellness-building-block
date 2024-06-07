@@ -183,6 +183,7 @@ type Storage interface {
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error
+	DeleteRingsRecordsForUsers(appID string, orgID string, accountsIDs []string) error
 }
 
 // Notifications wrapper

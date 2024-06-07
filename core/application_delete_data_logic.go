@@ -161,20 +161,19 @@ func (d deleteDataLogic) deleteAppOrgUsersData(appID string, orgID string, accou
 		return
 	}
 
-	// delete the todo entries
+	// delete the rings
 	err = d.storage.DeleteRingsForUsers(appID, orgID, accountsIDs)
 	if err != nil {
 		d.logger.Errorf("error deleting rings for users - %s", err)
 		return
 	}
-	/*
 
-		// delete the users
-		err = d.storage.DeleteUsersWithIDs(nil, appID, orgID, accountsIDs)
-		if err != nil {
-			d.logger.Errorf("error deleting the users - %s", err)
-			return
-		} */
+	// delete the rings records
+	err = d.storage.DeleteRingsForUsers(appID, orgID, accountsIDs)
+	if err != nil {
+		d.logger.Errorf("error deleting rings records for users - %s", err)
+		return
+	}
 }
 
 func (d deleteDataLogic) getAccountsIDs(memberships []model.DeletedMembership) []string {
