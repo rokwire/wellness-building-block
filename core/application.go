@@ -17,12 +17,16 @@ package core
 import (
 	"log"
 	"sync"
+
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 // Application represents the core application code based on hexagonal architecture
 type Application struct {
 	version string
 	build   string
+
+	logger *logs.Logger
 
 	cacheLock *sync.Mutex
 
@@ -35,22 +39,34 @@ type Application struct {
 	//TODO - remove this when applied to all environemnts
 	multiTenancyAppID string
 	multiTenancyOrgID string
+
+	deleteDataLogic deleteDataLogic
 }
 
 // Start starts the core part of the application
 func (app *Application) Start() {
-	err := app.MigrateMessageIDs()
+	err := app.deleteDataLogic.start()
+	if err != nil {
+		log.Fatalf("error on starting the delete data logic - %s", err)
+	}
+
+	err = app.MigrateMessageIDs()
 	if err != nil {
 		log.Printf("error on migrate message ids - %s", err)
 	}
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage,
+func NewApplication(version string, build string,
+	logger *logs.Logger, storage Storage,
 	core Core, notifications Notifications, mtAppID string, mtOrgID string) *Application {
 	cacheLock := &sync.Mutex{}
-	application := Application{version: version, build: build, cacheLock: cacheLock, storage: storage,
-		core: core, notifications: notifications, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID}
+
+	deleteDataLogic := deleteDataLogic{logger: logger, coreAdapter: core, storage: storage}
+
+	application := Application{version: version, build: build, logger: logger, cacheLock: cacheLock, storage: storage,
+		core: core, notifications: notifications, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID,
+		deleteDataLogic: deleteDataLogic}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

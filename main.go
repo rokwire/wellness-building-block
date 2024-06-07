@@ -45,6 +45,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/rokwire/core-auth-library-go/v2/authservice"
 	"github.com/rokwire/core-auth-library-go/v2/sigauth"
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 var (
@@ -58,6 +59,12 @@ func main() {
 	if len(Version) == 0 {
 		Version = "dev"
 	}
+
+	serviceID := "wellness"
+
+	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
+	loggerOpts.SuppressRequests = append(loggerOpts.SuppressRequests, logs.NewStandardHealthCheckHTTPRequestProperties("wellness/version")...)
+	logger := logs.NewLogger(serviceID, &loggerOpts)
 
 	port := getEnvKey("PORT", true)
 
@@ -83,7 +90,7 @@ func main() {
 	//serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 
 	authService := authservice.AuthService{
-		ServiceID:   "wellness",
+		ServiceID:   serviceID,
 		ServiceHost: serviceURL,
 		FirstParty:  true,
 		AuthBaseURL: coreBBHost,
@@ -131,10 +138,8 @@ func main() {
 		log.Fatalf("Error initializing notification adapter: %v", err)
 	}
 
-	//notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
-
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, coreAdapter, notificationsAdapter, mtAppID, mtOrgID)
+	application := core.NewApplication(Version, Build, logger, storageAdapter, coreAdapter, notificationsAdapter, mtAppID, mtOrgID)
 	application.Start()
 
 	config := model.Config{
