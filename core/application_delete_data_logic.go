@@ -153,14 +153,14 @@ func (d deleteDataLogic) deleteAppOrgUsersData(appID string, orgID string, accou
 		d.logger.Errorf("error deleting todo categories for users - %s", err)
 		return
 	}
-	/*
 
-		// delete the queue data items
-		err = d.storage.DeleteQueueDataForUsers(nil, appID, orgID, accountsIDs)
-		if err != nil {
-			d.logger.Errorf("error deleting the queue data items for users - %s", err)
-			return
-		}
+	// delete the todo entries
+	err = d.storage.DeleteTodoEntriesForUsers(appID, orgID, accountsIDs)
+	if err != nil {
+		d.logger.Errorf("error deleting todo entries for users - %s", err)
+		return
+	}
+	/*
 
 		// delete the users
 		err = d.storage.DeleteUsersWithIDs(nil, appID, orgID, accountsIDs)

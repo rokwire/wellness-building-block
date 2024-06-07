@@ -168,6 +168,7 @@ type Storage interface {
 	UpdateTodoEntriesTaskTime(context storage.TransactionContext, ids []string, taskTime time.Time) error
 	DeleteTodoEntry(context storage.TransactionContext, appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
+	DeleteTodoEntriesForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
 	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)

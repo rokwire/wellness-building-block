@@ -408,6 +408,21 @@ func (sa *Adapter) DeleteCompletedTodoEntries(appID string, orgID string, userID
 	return nil
 }
 
+// DeleteTodoEntriesForUsers deletes todo entries for users
+func (sa *Adapter) DeleteTodoEntriesForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.todoEntries.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "todo entry", nil, err)
+	}
+	return nil
+}
+
 // GetTodoEntriesWithCurrentReminderTime Gets all todo entries that are applied for the specified reminder datetime
 func (sa *Adapter) GetTodoEntriesWithCurrentReminderTime(context TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error) {
 	startDate := time.Date(reminderTime.Year(), reminderTime.Month(), reminderTime.Day(), reminderTime.Hour(), reminderTime.Minute(), 0, 0, reminderTime.Location())
