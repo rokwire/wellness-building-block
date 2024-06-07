@@ -29,6 +29,7 @@ type Application struct {
 	Services Services //expose to the drivers adapters
 
 	storage       Storage
+	core          Core
 	notifications Notifications
 
 	//TODO - remove this when applied to all environemnts
@@ -45,10 +46,11 @@ func (app *Application) Start() {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, notifications Notifications, mtAppID string, mtOrgID string) *Application {
+func NewApplication(version string, build string, storage Storage,
+	core Core, notifications Notifications, mtAppID string, mtOrgID string) *Application {
 	cacheLock := &sync.Mutex{}
 	application := Application{version: version, build: build, cacheLock: cacheLock, storage: storage,
-		notifications: notifications, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID}
+		core: core, notifications: notifications, multiTenancyAppID: mtAppID, multiTenancyOrgID: mtOrgID}
 
 	// add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

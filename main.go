@@ -37,6 +37,7 @@ import (
 	"strings"
 	"wellness/core"
 	"wellness/core/model"
+	coreAdapter "wellness/driven/core"
 	"wellness/driven/notifications"
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
@@ -120,6 +121,9 @@ func main() {
 		log.Fatalf("Error initializing service account manager: %v", err)
 	}
 
+	// Core adapter
+	coreAdapter := coreAdapter.NewCoreAdapter(coreBBHost, serviceAccountManager)
+
 	// Notification adapter
 	notificationsBaseURL := getEnvKey("NOTIFICATIONS_BASE_URL", true)
 	notificationsAdapter := notifications.NewNotificationsAdapter(notificationsBaseURL, notificationsBaseURL, serviceAccountManager, mtAppID, mtOrgID)
@@ -130,7 +134,7 @@ func main() {
 	//notificationsAdapter := notifications.NewNotificationsAdapter(internalAPIKey, notificationsServiceReg.Host, mtAppID, mtOrgID)
 
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, notificationsAdapter, mtAppID, mtOrgID)
+	application := core.NewApplication(Version, Build, storageAdapter, coreAdapter, notificationsAdapter, mtAppID, mtOrgID)
 	application.Start()
 
 	config := model.Config{

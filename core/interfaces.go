@@ -187,3 +187,8 @@ type Notifications interface {
 	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, time *int64, data map[string]string) (*string, error)
 	DeleteNotification(appID string, orgID string, id string) error
 }
+
+// Core exposes Core APIs for the driver adapters
+type Core interface {
+	LoadDeletedMemberships() ([]model.DeletedUserData, error)
+}
