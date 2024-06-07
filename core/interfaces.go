@@ -156,6 +156,7 @@ type Storage interface {
 	CreateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	DeleteTodoCategory(appID string, orgID string, userID string, id string) error
+	DeleteTodoCategoriesForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetTodoEntriesWithCurrentReminderTime(context storage.TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntriesWithCurrentDueTime(context storage.TransactionContext, dueTime time.Time) ([]model.TodoEntry, error)
@@ -167,6 +168,7 @@ type Storage interface {
 	UpdateTodoEntriesTaskTime(context storage.TransactionContext, ids []string, taskTime time.Time) error
 	DeleteTodoEntry(context storage.TransactionContext, appID string, orgID string, userID string, id string) error
 	DeleteCompletedTodoEntries(appID string, orgID string, userID string) error
+	DeleteTodoEntriesForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
 	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)
@@ -174,16 +176,23 @@ type Storage interface {
 	DeleteRing(appID string, orgID string, userID string, id string) error
 	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
 	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
+	DeleteRingsForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
 	GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error)
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error
+	DeleteRingsRecordsForUsers(appID string, orgID string, accountsIDs []string) error
 }
 
 // Notifications wrapper
 type Notifications interface {
 	SendNotification(recipients []model.NotificationRecipient, topic *string, title string, text string, appID string, orgID string, time *int64, data map[string]string) (*string, error)
 	DeleteNotification(appID string, orgID string, id string) error
+}
+
+// Core exposes Core APIs for the driver adapters
+type Core interface {
+	LoadDeletedMemberships() ([]model.DeletedUserData, error)
 }

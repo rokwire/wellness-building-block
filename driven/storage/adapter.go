@@ -248,6 +248,21 @@ func (sa *Adapter) DeleteTodoCategory(appID string, orgID string, userID string,
 	return nil
 }
 
+// DeleteTodoCategoriesForUsers the todo categories for users
+func (sa *Adapter) DeleteTodoCategoriesForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.todoCategories.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "todo category", nil, err)
+	}
+	return nil
+}
+
 // GetTodoEntries gets user's todo entries
 func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error) {
 	filter := bson.D{
@@ -390,6 +405,21 @@ func (sa *Adapter) DeleteCompletedTodoEntries(appID string, orgID string, userID
 		return err
 	}
 
+	return nil
+}
+
+// DeleteTodoEntriesForUsers deletes todo entries for users
+func (sa *Adapter) DeleteTodoEntriesForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.todoEntries.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "todo entry", nil, err)
+	}
 	return nil
 }
 
@@ -646,6 +676,21 @@ func (sa *Adapter) DeleteRingHistory(appID string, orgID string, userID string, 
 	return sa.GetRing(appID, orgID, userID, ringID)
 }
 
+// DeleteRingsForUsers deletes rings for users
+func (sa *Adapter) DeleteRingsForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.rings.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "ring", nil, err)
+	}
+	return nil
+}
+
 // GetRingsRecords Get all ring records for the corresponding ring id
 func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
 	filter := bson.D{
@@ -774,6 +819,21 @@ func (sa *Adapter) DeleteRingsRecords(appID string, orgID string, userID string,
 		return fmt.Errorf("error delete a ring records: %s", err)
 	}
 
+	return nil
+}
+
+// DeleteRingsRecordsForUsers deletes a rings records for users
+func (sa *Adapter) DeleteRingsRecordsForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.ringsRecords.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "ring", nil, err)
+	}
 	return nil
 }
 
