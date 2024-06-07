@@ -176,6 +176,7 @@ type Storage interface {
 	DeleteRing(appID string, orgID string, userID string, id string) error
 	CreateRingHistory(appID string, orgID string, userID string, ringID string, ringHistory *model.RingHistoryEntry) (*model.Ring, error)
 	DeleteRingHistory(appID string, orgID string, userID string, ringID string, ringHistoryID string) (*model.Ring, error)
+	DeleteRingsForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
 	GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error)

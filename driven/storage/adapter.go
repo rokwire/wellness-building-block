@@ -676,6 +676,21 @@ func (sa *Adapter) DeleteRingHistory(appID string, orgID string, userID string, 
 	return sa.GetRing(appID, orgID, userID, ringID)
 }
 
+// DeleteRingsForUsers deletes rings for users
+func (sa *Adapter) DeleteRingsForUsers(appID string, orgID string, accountsIDs []string) error {
+	filter := bson.D{
+		primitive.E{Key: "org_id", Value: orgID},
+		primitive.E{Key: "app_id", Value: appID},
+		primitive.E{Key: "user_id", Value: bson.M{"$in": accountsIDs}},
+	}
+
+	_, err := sa.db.rings.DeleteManyWithContext(nil, filter, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionDelete, "ring", nil, err)
+	}
+	return nil
+}
+
 // GetRingsRecords Get all ring records for the corresponding ring id
 func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error) {
 	filter := bson.D{

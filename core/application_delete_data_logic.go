@@ -160,6 +160,13 @@ func (d deleteDataLogic) deleteAppOrgUsersData(appID string, orgID string, accou
 		d.logger.Errorf("error deleting todo entries for users - %s", err)
 		return
 	}
+
+	// delete the todo entries
+	err = d.storage.DeleteRingsForUsers(appID, orgID, accountsIDs)
+	if err != nil {
+		d.logger.Errorf("error deleting rings for users - %s", err)
+		return
+	}
 	/*
 
 		// delete the users
