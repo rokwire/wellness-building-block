@@ -10,6 +10,9 @@ RUN make
 
 FROM alpine:3.17
 
+#we need timezone database
+RUN apk add --no-cache --update tzdata
+
 COPY --from=builder /wellness-app/bin/wellness /
 COPY --from=builder /wellness-app/docs/swagger.yaml /docs/swagger.yaml
 
