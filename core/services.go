@@ -64,7 +64,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 		var err error
 		if todo.DueDateTime != nil {
 			dueDateTime := todo.DueDateTime.Unix()
-			dueMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
+			dueMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
@@ -80,7 +80,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 		}
 		if todo.ReminderDateTime != nil {
 			reminderDateTime := todo.ReminderDateTime.Unix()
-			reminderMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
+			reminderMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
 				"type":        "wellness_todo_entry",
 				"operation":   "todo_reminder",
 				"entity_type": "wellness_todo_entry",
@@ -122,7 +122,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			if todoEntry.DueDateTime != todo.DueDateTime {
 				topic := "update due date time"
 				dueDateTime := todo.DueDateTime.Unix()
-				duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
+				duoMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
@@ -150,7 +150,7 @@ func (app *Application) updateTodoEntry(appID string, orgID string, userID strin
 			if todoEntry.ReminderDateTime != todo.ReminderDateTime {
 				topic := "update due date time"
 				reminderDateTime := todo.ReminderDateTime.Unix()
-				reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "TODO Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
+				reminderMsg, err := app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
 					"type":        "wellness_todo_entry",
 					"operation":   "todo_reminder",
 					"entity_type": "wellness_todo_entry",
