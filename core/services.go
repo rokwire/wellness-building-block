@@ -278,3 +278,7 @@ func (app *Application) updateRingsRecord(appID string, orgID string, userID str
 func (app *Application) deleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error {
 	return app.storage.DeleteRingsRecords(appID, orgID, userID, ringID, recordID)
 }
+
+func (app *Application) getUserData(userID string) (*model.UserDataResponse, error) {
+	return nil, nil
+}

@@ -49,6 +49,8 @@ type Services interface {
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error
+
+	GetUserData(userID string) (*model.UserDataResponse, error)
 }
 
 type servicesImpl struct {
@@ -145,6 +147,10 @@ func (s *servicesImpl) UpdateRingsRecord(appID string, orgID string, userID stri
 
 func (s *servicesImpl) DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error {
 	return s.app.deleteRingsRecords(appID, orgID, userID, ringID, recordID)
+}
+
+func (s *servicesImpl) GetUserData(userID string) (*model.UserDataResponse, error) {
+	return s.app.getUserData(userID)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
