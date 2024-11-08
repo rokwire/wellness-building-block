@@ -50,7 +50,7 @@ type Services interface {
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	DeleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error
 
-	GetUserData(appID string, orgID string, userID string) (*model.UserDataResponse, error)
+	GetUserData(userID string) (*model.UserDataResponse, error)
 }
 
 type servicesImpl struct {
@@ -149,8 +149,8 @@ func (s *servicesImpl) DeleteRingsRecords(appID string, orgID string, userID str
 	return s.app.deleteRingsRecords(appID, orgID, userID, ringID, recordID)
 }
 
-func (s *servicesImpl) GetUserData(appID string, orgID string, userID string) (*model.UserDataResponse, error) {
-	return s.app.getUserData(appID, orgID, userID)
+func (s *servicesImpl) GetUserData(userID string) (*model.UserDataResponse, error) {
+	return s.app.getUserData(userID)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -158,6 +158,7 @@ type Storage interface {
 	PerformTransaction(transaction func(context storage.TransactionContext) error) error
 
 	GetTodoCategories(appID string, orgID string, userID string) ([]model.TodoCategory, error)
+	GetTodoCategoriesByUserID(userID string) ([]model.TodoCategory, error)
 	GetTodoCategory(appID string, orgID string, userID string, id string) (*model.TodoCategory, error)
 	CreateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
 	UpdateTodoCategory(appID string, orgID string, userID string, category *model.TodoCategory) (*model.TodoCategory, error)
@@ -167,6 +168,7 @@ type Storage interface {
 	GetTodoEntriesWithCurrentReminderTime(context storage.TransactionContext, reminderTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntriesWithCurrentDueTime(context storage.TransactionContext, dueTime time.Time) ([]model.TodoEntry, error)
 	GetTodoEntries(appID string, orgID string, userID string) ([]model.TodoEntry, error)
+	GetTodoEntriesByUserID(userID string) ([]model.TodoEntry, error)
 	GetTodoEntriesForMigration() ([]model.TodoEntry, error)
 	GetTodoEntry(context storage.TransactionContext, appID string, orgID string, userID string, id string) (*model.TodoEntry, error)
 	CreateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, messageIDs model.MessageIDs, entityID string) (*model.TodoEntry, error)
@@ -177,6 +179,7 @@ type Storage interface {
 	DeleteTodoEntriesForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRings(appID string, orgID string, userID string) ([]model.Ring, error)
+	GetRingsByUserID(userID string) ([]model.Ring, error)
 	GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error)
 	CreateRing(appID string, orgID string, userID string, category *model.Ring) (*model.Ring, error)
 	DeleteRing(appID string, orgID string, userID string, id string) error
@@ -185,6 +188,7 @@ type Storage interface {
 	DeleteRingsForUsers(appID string, orgID string, accountsIDs []string) error
 
 	GetRingsRecords(appID string, orgID string, userID string, ringID *string, startDateEpoch *int64, endDateEpoch *int64, offset *int64, limit *int64, order *string) ([]model.RingRecord, error)
+	GetRingsRecordsByUserID(userID string) ([]model.RingRecord, error)
 	GetRingsRecord(appID string, orgID string, userID string, id string) (*model.RingRecord, error)
 	CreateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)
 	UpdateRingsRecord(appID string, orgID string, userID string, record *model.RingRecord) (*model.RingRecord, error)

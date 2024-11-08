@@ -279,6 +279,61 @@ func (app *Application) deleteRingsRecords(appID string, orgID string, userID st
 	return app.storage.DeleteRingsRecords(appID, orgID, userID, ringID, recordID)
 }
 
-func (app *Application) getUserData(appID string, orgID string, userID string) (*model.UserDataResponse, error) {
-	return nil, nil
+func (app *Application) getUserData(userID string) (*model.UserDataResponse, error) {
+	var ringsResponse []model.RingResponse
+	var ringsRecordsResponse []model.RingRecordResponse
+	var todoEntriesResponse []model.TodoEntryResponse
+	var todoCategoriesResponse []model.TodoCategoryResponse
+
+	rings, err := app.storage.GetRingsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if rings != nil {
+		for _, r := range rings {
+			ri := model.RingResponse{ID: r.ID, UserID: r.UserID}
+			ringsResponse = append(ringsResponse, ri)
+		}
+	}
+
+	ringsRecords, err := app.storage.GetRingsRecordsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if ringsRecords != nil {
+		for _, rr := range ringsRecords {
+			rrr := model.RingRecordResponse{ID: rr.ID, UserID: rr.UserID}
+			ringsRecordsResponse = append(ringsRecordsResponse, rrr)
+		}
+	}
+
+	todoEnries, err := app.storage.GetTodoEntriesByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if todoEnries != nil {
+		for _, t := range todoEnries {
+			tr := model.TodoEntryResponse{ID: t.ID, UserID: t.UserID}
+			todoEntriesResponse = append(todoEntriesResponse, tr)
+		}
+	}
+
+	todoCategories, err := app.storage.GetTodoCategoriesByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if todoCategories != nil {
+		for _, c := range todoCategories {
+			cr := model.TodoCategoryResponse{ID: c.ID, UserID: c.UserID}
+			todoCategoriesResponse = append(todoCategoriesResponse, cr)
+		}
+	}
+
+	userDataResponse := model.UserDataResponse{Rings: ringsResponse, RingsRecord: ringsRecordsResponse, TodoEntries: todoEntriesResponse, TodoCategories: todoCategoriesResponse}
+
+	return &userDataResponse, nil
 }
