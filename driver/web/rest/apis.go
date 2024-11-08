@@ -1044,7 +1044,7 @@ func intPostValueFromString(stringValue string) int {
 // @Security UserAuth
 // @Router /api/user-data [get]
 func (h ApisHandler) GetUserData(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
-	userData, err := h.app.Services.GetUserData(claims.Subject)
+	userData, err := h.app.Services.GetUserData(claims.AppID, claims.OrgID, claims.Subject)
 	if err != nil {
 		log.Printf("Error on creating user ring record: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
