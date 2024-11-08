@@ -72,6 +72,20 @@ definitions:
       value:
         type: number
     type: object
+  RingRecordResponse:
+    properties:
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  RingResponse:
+    properties:
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
   TodoCategory:
     properties:
       app_id:
@@ -87,6 +101,13 @@ definitions:
       name:
         type: string
       org_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  TodoCategoryResponse:
+    properties:
+      id:
         type: string
       user_id:
         type: string
@@ -113,6 +134,8 @@ definitions:
         type: string
       location:
         type: string
+      message_ids:
+        $ref: '#/definitions/model.MessageIDs'
       org_id:
         type: string
       reminder_date_time:
@@ -128,6 +151,32 @@ definitions:
       work_days:
         items:
           type: string
+        type: array
+    type: object
+  TodoEntryResponse:
+    properties:
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  UserDataResponse:
+    properties:
+      rings:
+        items:
+          $ref: '#/definitions/RingResponse'
+        type: array
+      rings_records:
+        items:
+          $ref: '#/definitions/RingRecordResponse'
+        type: array
+      todo_categories:
+        items:
+          $ref: '#/definitions/TodoCategoryResponse'
+        type: array
+      todo_entries:
+        items:
+          $ref: '#/definitions/TodoEntryResponse'
         type: array
     type: object
   createUserRingRecordRequestBody:
@@ -148,6 +197,13 @@ definitions:
       value:
         type: number
     type: object
+  model.MessageIDs:
+    properties:
+      due_date_message_id:
+        type: string
+      reminder_date_message_id:
+        type: string
+    type: object
 host: localhost
 info:
   contact: {}
@@ -158,13 +214,26 @@ info:
   title: Rokwire Wellness Building Block API
   version: 1.0.2
 paths:
+  /api/user-data:
+    get:
+      description: Gets all related user data
+      operationId: GetUserData
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserDataResponse'
+      security:
+      - UserAuth: []
+      tags:
+      - Client
   /api/user/all_rings_records:
     delete:
       description: Deletes all user ring records (no matter of ring_id)
       operationId: DeleteAllUserRingRecords
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -291,7 +360,7 @@ paths:
           $ref: '#/definitions/createUserRingRequestBody'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -303,7 +372,7 @@ paths:
       operationId: DeleteUserRingHistoryEntry
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -314,7 +383,7 @@ paths:
       operationId: DeleteUserRingRecords
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -385,7 +454,7 @@ paths:
       operationId: DeleteUserRingRecord
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -473,7 +542,7 @@ paths:
       operationId: DeleteUserTodoCategory
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -563,7 +632,7 @@ paths:
       operationId: DeleteUserTodoEntry
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -611,7 +680,7 @@ paths:
       operationId: DeleteCompletedUserTodoEntry
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - UserAuth: []
       tags:
@@ -624,7 +693,7 @@ paths:
       - text/plain
       responses:
         "200":
-          description: ""
+          description: OK
       tags:
       - Client
 schemes:

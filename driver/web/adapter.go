@@ -114,6 +114,8 @@ func (we Adapter) Start() {
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.UpdateUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("PUT")
 	subRouter.HandleFunc("/user/rings/{id}/records/{record-id}", we.coreAuthWrapFunc(we.apisHandler.DeleteUserRingRecord, we.auth.coreAuth.standardAuth)).Methods("DELETE")
 
+	subRouter.HandleFunc("/user-data", we.coreAuthWrapFunc(we.apisHandler.GetUserData, we.auth.coreAuth.standardAuth)).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 

@@ -16,6 +16,28 @@
     "host": "localhost",
     "basePath": "/wellness",
     "paths": {
+        "/api/user-data": {
+            "get": {
+                "security": [
+                    {
+                        "UserAuth": []
+                    }
+                ],
+                "description": "Gets all related user data",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "GetUserData",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/user/all_rings_records": {
             "get": {
                 "security": [
@@ -85,7 +107,7 @@
                 "operationId": "DeleteAllUserRingRecords",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -232,7 +254,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -251,7 +273,7 @@
                 "operationId": "DeleteUserRingHistoryEntry",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -362,7 +384,7 @@
                 "operationId": "DeleteUserRingRecords",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -447,7 +469,7 @@
                 "operationId": "DeleteUserRingRecord",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -588,7 +610,7 @@
                 "operationId": "DeleteUserTodoCategory",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -672,7 +694,7 @@
                 "operationId": "DeleteCompletedUserTodoEntry",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -751,7 +773,7 @@
                 "operationId": "DeleteUserTodoEntry",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -768,7 +790,7 @@
                 "operationId": "Version",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -885,6 +907,28 @@
                 }
             }
         },
+        "RingRecordResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "RingResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "TodoCategory": {
             "type": "object",
             "properties": {
@@ -907,6 +951,17 @@
                     "type": "string"
                 },
                 "org_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "TodoCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 },
                 "user_id": {
@@ -947,6 +1002,9 @@
                 "location": {
                     "type": "string"
                 },
+                "message_ids": {
+                    "$ref": "#/definitions/model.MessageIDs"
+                },
                 "org_id": {
                     "type": "string"
                 },
@@ -969,6 +1027,46 @@
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                }
+            }
+        },
+        "TodoEntryResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserDataResponse": {
+            "type": "object",
+            "properties": {
+                "rings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RingResponse"
+                    }
+                },
+                "rings_records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RingRecordResponse"
+                    }
+                },
+                "todo_categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TodoCategoryResponse"
+                    }
+                },
+                "todo_entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TodoEntryResponse"
                     }
                 }
             }
@@ -998,6 +1096,17 @@
                 },
                 "value": {
                     "type": "number"
+                }
+            }
+        },
+        "model.MessageIDs": {
+            "type": "object",
+            "properties": {
+                "due_date_message_id": {
+                    "type": "string"
+                },
+                "reminder_date_message_id": {
+                    "type": "string"
                 }
             }
         }

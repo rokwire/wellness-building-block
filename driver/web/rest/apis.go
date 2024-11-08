@@ -1036,6 +1036,17 @@ func intPostValueFromString(stringValue string) int {
 	return value
 }
 
+// GetUserData Gets all related user data
+// @Description  Gets all related user data
+// @ID GetUserData
+// @Tags Client
+// @Success 200 {object} model.UserDataResponse
+// @Security UserAuth
+// @Router /api/user-data [get]
+func (h ApisHandler) GetUserData(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	return
+}
+
 // NewApisHandler creates new rest Handler instance
 func NewApisHandler(app *core.Application) ApisHandler {
 	return ApisHandler{app: app}
