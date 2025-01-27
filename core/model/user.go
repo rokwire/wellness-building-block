@@ -14,34 +14,10 @@
 
 package model
 
-// RingResponse represents wellness ring wrapper
-type RingResponse struct {
-	ID     string `json:"id" bson:"_id"`
-	UserID string `json:"user_id" bson:"user_id"`
-} // @name RingResponse
-
-// RingRecordResponse represents individual daily records for an individual ring
-type RingRecordResponse struct {
-	ID     string `json:"id" bson:"_id"`
-	UserID string `json:"user_id" bson:"user_id"`
-} //@name RingRecordResponse
-
-// TodoCategoryResponse user defined todo category
-type TodoCategoryResponse struct {
-	ID     string `json:"id" bson:"_id"`
-	UserID string `json:"user_id" bson:"user_id"`
-} // @name TodoCategoryResponse
-
-// TodoEntryResponse user todo entry
-type TodoEntryResponse struct {
-	ID     string `json:"id" bson:"_id"`
-	UserID string `json:"user_id" bson:"user_id"`
-} // @name TodoEntryResponse
-
 // UserDataResponse user todo entry
 type UserDataResponse struct {
-	Rings          []RingResponse         `json:"rings"`
-	RingsRecord    []RingRecordResponse   `json:"rings_records"`
-	TodoEntries    []TodoEntryResponse    `json:"todo_entries"`
-	TodoCategories []TodoCategoryResponse `json:"todo_categories"`
+	Rings          []Ring         `json:"my_rings"`
+	RingsRecord    []RingRecord   `json:"my_rings_records"`
+	TodoEntries    []TodoEntry    `json:"todo_entries"`
+	TodoCategories []TodoCategory `json:"todo_categories"`
 } // @name UserDataResponse

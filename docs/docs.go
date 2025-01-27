@@ -910,28 +910,6 @@ const docTemplate = `{
                 }
             }
         },
-        "RingRecordResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "RingResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
         "TodoCategory": {
             "type": "object",
             "properties": {
@@ -954,17 +932,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "org_id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "TodoCategoryResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
                     "type": "string"
                 },
                 "user_id": {
@@ -1034,42 +1001,31 @@ const docTemplate = `{
                 }
             }
         },
-        "TodoEntryResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
         "UserDataResponse": {
             "type": "object",
             "properties": {
-                "rings": {
+                "my_rings": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/RingResponse"
+                        "$ref": "#/definitions/Ring"
                     }
                 },
-                "rings_records": {
+                "my_rings_records": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/RingRecordResponse"
+                        "$ref": "#/definitions/RingRecord"
                     }
                 },
                 "todo_categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/TodoCategoryResponse"
+                        "$ref": "#/definitions/TodoCategory"
                     }
                 },
                 "todo_entries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/TodoEntryResponse"
+                        "$ref": "#/definitions/TodoEntry"
                     }
                 }
             }
@@ -1148,6 +1104,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Rokwire Content Building Block API Documentation.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

@@ -72,20 +72,6 @@ definitions:
       value:
         type: number
     type: object
-  RingRecordResponse:
-    properties:
-      id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  RingResponse:
-    properties:
-      id:
-        type: string
-      user_id:
-        type: string
-    type: object
   TodoCategory:
     properties:
       app_id:
@@ -101,13 +87,6 @@ definitions:
       name:
         type: string
       org_id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  TodoCategoryResponse:
-    properties:
-      id:
         type: string
       user_id:
         type: string
@@ -153,30 +132,23 @@ definitions:
           type: string
         type: array
     type: object
-  TodoEntryResponse:
-    properties:
-      id:
-        type: string
-      user_id:
-        type: string
-    type: object
   UserDataResponse:
     properties:
-      rings:
+      my_rings:
         items:
-          $ref: '#/definitions/RingResponse'
+          $ref: '#/definitions/Ring'
         type: array
-      rings_records:
+      my_rings_records:
         items:
-          $ref: '#/definitions/RingRecordResponse'
+          $ref: '#/definitions/RingRecord'
         type: array
       todo_categories:
         items:
-          $ref: '#/definitions/TodoCategoryResponse'
+          $ref: '#/definitions/TodoCategory'
         type: array
       todo_entries:
         items:
-          $ref: '#/definitions/TodoEntryResponse'
+          $ref: '#/definitions/TodoEntry'
         type: array
     type: object
   createUserRingRecordRequestBody:
