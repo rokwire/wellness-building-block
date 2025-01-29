@@ -1036,6 +1036,33 @@ func intPostValueFromString(stringValue string) int {
 	return value
 }
 
+// GetUserData Gets all related user data
+// @Description  Gets all related user data
+// @ID GetUserData
+// @Tags Client
+// @Success 200 {object} model.UserDataResponse
+// @Security UserAuth
+// @Router /api/user-data [get]
+func (h ApisHandler) GetUserData(claims *tokenauth.Claims, w http.ResponseWriter, r *http.Request) {
+	userData, err := h.app.Services.GetUserData(claims.Subject)
+	if err != nil {
+		log.Printf("Error on creating user ring record: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(userData)
+	if err != nil {
+		log.Printf("Error on marshal the new user data: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
 // NewApisHandler creates new rest Handler instance
 func NewApisHandler(app *core.Application) ApisHandler {
 	return ApisHandler{app: app}

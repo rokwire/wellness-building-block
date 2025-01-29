@@ -278,3 +278,83 @@ func (app *Application) updateRingsRecord(appID string, orgID string, userID str
 func (app *Application) deleteRingsRecords(appID string, orgID string, userID string, ringID *string, recordID *string) error {
 	return app.storage.DeleteRingsRecords(appID, orgID, userID, ringID, recordID)
 }
+
+func (app *Application) getUserData(userID string) (*model.UserDataResponse, error) {
+	type result struct {
+		data interface{}
+		err  error
+	}
+
+	// Create channels to get results concurrently
+	ringsChan := make(chan result)
+	ringsRecordChan := make(chan result)
+	todoCategoryChan := make(chan result)
+	todoEntryChan := make(chan result)
+
+	// Fetch Rings concurrently
+	go func() {
+		rings, err := app.storage.GetRingsByUserID(userID)
+		if rings == nil {
+			rings = nil
+		}
+		ringsChan <- result{data: rings, err: err}
+	}()
+
+	// Fetch Rings Records concurrently
+	go func() {
+		ringsRecord, err := app.storage.GetRingsRecordsByUserID(userID)
+		if ringsRecord == nil {
+			ringsRecord = nil
+		}
+		ringsRecordChan <- result{data: ringsRecord, err: err}
+	}()
+
+	// Fetch Todo Categories concurrently
+	go func() {
+		todoCategory, err := app.storage.GetTodoCategoriesByUserID(userID)
+		if todoCategory == nil {
+			todoCategory = nil
+		}
+		todoCategoryChan <- result{data: todoCategory, err: err}
+	}()
+
+	// Fetch Todo Entries concurrently
+	go func() {
+		todoEntry, err := app.storage.GetTodoEntriesByUserID(userID)
+		if todoEntry == nil {
+			todoEntry = nil
+		}
+		todoEntryChan <- result{data: todoEntry, err: err}
+	}()
+
+	// Collect results
+	ringsRes := <-ringsChan
+	if ringsRes.err != nil {
+		return nil, ringsRes.err
+	}
+
+	ringsRecordRes := <-ringsRecordChan
+	if ringsRecordRes.err != nil {
+		return nil, ringsRecordRes.err
+	}
+
+	todoCategoryRes := <-todoCategoryChan
+	if todoCategoryRes.err != nil {
+		return nil, todoCategoryRes.err
+	}
+
+	todoEntryRes := <-todoEntryChan
+	if todoEntryRes.err != nil {
+		return nil, todoEntryRes.err
+	}
+
+	// Create the response
+	userData := model.UserDataResponse{
+		Rings:          ringsRes.data.([]model.Ring),             // Adjust type assertion based on actual data type
+		RingsRecord:    ringsRecordRes.data.([]model.RingRecord), // Adjust type assertion
+		TodoCategories: todoCategoryRes.data.([]model.TodoCategory),
+		TodoEntries:    todoEntryRes.data.([]model.TodoEntry),
+	}
+
+	return &userData, nil
+}

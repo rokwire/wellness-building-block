@@ -87,6 +87,20 @@ func (sa *Adapter) GetTodoCategories(appID string, orgID string, userID string) 
 	return result, nil
 }
 
+// GetTodoCategoriesByUserID gets all user defined todo categories
+func (sa *Adapter) GetTodoCategoriesByUserID(userID string) ([]model.TodoCategory, error) {
+	filter := bson.D{
+		primitive.E{Key: "user_id", Value: userID},
+	}
+
+	var result []model.TodoCategory
+	err := sa.db.todoCategories.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // GetTodoCategory gets a single user defined todo category by id
 func (sa *Adapter) GetTodoCategory(appID string, orgID string, userID string, id string) (*model.TodoCategory, error) {
 	filter := bson.D{
@@ -273,6 +287,20 @@ func (sa *Adapter) GetTodoEntries(appID string, orgID string, userID string) ([]
 
 	var result []model.TodoEntry
 	err := sa.db.todoEntries.Find(filter, &result, &options.FindOptions{Sort: bson.D{{"name", 1}}})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// GetTodoEntriesByUserID gets user's todo entries
+func (sa *Adapter) GetTodoEntriesByUserID(userID string) ([]model.TodoEntry, error) {
+	filter := bson.D{
+		primitive.E{Key: "user_id", Value: userID},
+	}
+
+	var result []model.TodoEntry
+	err := sa.db.todoEntries.Find(filter, &result, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -515,6 +543,20 @@ func (sa *Adapter) GetRings(appID string, orgID string, userID string) ([]model.
 	return result, nil
 }
 
+// GetRingsByUser gets user's wellness rings
+func (sa *Adapter) GetRingsByUserID(userID string) ([]model.Ring, error) {
+	filter := bson.D{
+		primitive.E{Key: "user_id", Value: userID},
+	}
+
+	var result []model.Ring
+	err := sa.db.rings.Find(filter, &result, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // GetRing get a single user wellness ring
 func (sa *Adapter) GetRing(appID string, orgID string, userID string, id string) (*model.Ring, error) {
 	filter := bson.D{
@@ -729,6 +771,21 @@ func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ri
 
 	var list []model.RingRecord
 	err := sa.db.ringsRecords.Find(filter, &list, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// GetRingsRecords Get all ring records for the corresponding ring id
+func (sa *Adapter) GetRingsRecordsByUserID(userID string) ([]model.RingRecord, error) {
+	filter := bson.D{
+		primitive.E{Key: "user_id", Value: userID},
+	}
+
+	var list []model.RingRecord
+	err := sa.db.ringsRecords.Find(filter, &list, nil)
 	if err != nil {
 		return nil, err
 	}
