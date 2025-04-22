@@ -8,10 +8,10 @@ WORKDIR /wellness-app
 COPY . .
 RUN make
 
-FROM alpine:3.17
+FROM alpine:3.21.3
 
-#we need timezone database
-RUN apk add --no-cache --update tzdata
+#we need timezone database + certificates
+RUN apk add --no-cache tzdata ca-certificates
 
 COPY --from=builder /wellness-app/bin/wellness /
 COPY --from=builder /wellness-app/docs/swagger.yaml /docs/swagger.yaml
