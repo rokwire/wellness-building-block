@@ -543,7 +543,7 @@ func (sa *Adapter) GetRings(appID string, orgID string, userID string) ([]model.
 	return result, nil
 }
 
-// GetRingsByUser gets user's wellness rings
+// GetRingsByUserID gets user's wellness rings
 func (sa *Adapter) GetRingsByUserID(userID string) ([]model.Ring, error) {
 	filter := bson.D{
 		primitive.E{Key: "user_id", Value: userID},
@@ -778,7 +778,7 @@ func (sa *Adapter) GetRingsRecords(appID string, orgID string, userID string, ri
 	return list, nil
 }
 
-// GetRingsRecords Get all ring records for the corresponding ring id
+// GetRingsRecordsByUserID Get all ring records for the corresponding ring id
 func (sa *Adapter) GetRingsRecordsByUserID(userID string) ([]model.RingRecord, error) {
 	filter := bson.D{
 		primitive.E{Key: "user_id", Value: userID},
