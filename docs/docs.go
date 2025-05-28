@@ -1104,8 +1104,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Rokwire Content Building Block API Documentation.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
+	//LeftDelim:        "{{",
+	//RightDelim:       "}}",
 }
 
 func init() {
