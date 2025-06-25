@@ -1,4 +1,4 @@
-FROM golang:1.18-buster AS builder
+FROM golang:1.18-buster as builder
 
 ENV CGO_ENABLED=0
 
