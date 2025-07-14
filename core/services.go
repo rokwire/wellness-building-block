@@ -57,49 +57,67 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
 	var createTodoEntry *model.TodoEntry
 	entityID := uuid.NewString()
+
 	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		topic := "create todo entry"
 		var dueMsgID *string
 		var reminderMsgID *string
 		var err error
-		if todo.DueDateTime != nil {
-			dueDateTime := todo.DueDateTime.Unix()
-			dueMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
-				"type":        "wellness_todo_entry",
-				"operation":   "todo_reminder",
-				"entity_type": "wellness_todo_entry",
-				"entity_id":   entityID,
-				"entity_name": todo.Title,
-			})
 
-			if err != nil {
-				log.Printf("Error on sending DueDateTime notification %s inbox message: %s", todo.ID, err)
-				//return err // Don't propagate the error. Just create the reminder.
+		// Check if reminders are enabled before sending notifications
+		if todo.ReminderType != "none" {
+			log.Printf("Reminders are ENABLED for this to-do entry: %s", todo.Title)
+
+			if todo.DueDateTime != nil {
+				dueDateTime := todo.DueDateTime.Unix()
+				dueMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
+					"type":        "wellness_todo_entry",
+					"operation":   "todo_reminder",
+					"entity_type": "wellness_todo_entry",
+					"entity_id":   entityID,
+					"entity_name": todo.Title,
+				})
+
+				if err != nil {
+					log.Printf("Error sending DueDateTime notification for %s: %s", todo.ID, err)
+				} else {
+					log.Printf("Successfully sent DueDateTime notification for %s", entityID)
+				}
 			}
-			log.Printf("Sent DueDateTime notification %s successfully", entityID)
-		}
-		if todo.ReminderDateTime != nil {
-			reminderDateTime := todo.ReminderDateTime.Unix()
-			reminderMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
-				"type":        "wellness_todo_entry",
-				"operation":   "todo_reminder",
-				"entity_type": "wellness_todo_entry",
-				"entity_id":   entityID,
-				"entity_name": todo.Title,
-			})
-			if err != nil {
-				log.Printf("Error on sending ReminderDateTime notification %s inbox message: %s", todo.ID, err)
-				//return err // Don't propagate the error. Just create the reminder.
+
+			if todo.ReminderDateTime != nil {
+				reminderDateTime := todo.ReminderDateTime.Unix()
+				reminderMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
+					"type":        "wellness_todo_entry",
+					"operation":   "todo_reminder",
+					"entity_type": "wellness_todo_entry",
+					"entity_id":   entityID,
+					"entity_name": todo.Title,
+				})
+
+				if err != nil {
+					log.Printf("Error sending ReminderDateTime notification for %s: %s", todo.ID, err)
+					//return err // Don't propagate the error. Just create the reminder.
+				} else {
+					log.Printf("Successfully sent ReminderDateTime notification for %s", entityID)
+				}
 			}
-			log.Printf("Sent ReminderDateTime notification %s successfully", entityID)
+		} else {
+			log.Printf("ℹ️ Reminders are DISABLED for this to-do entry: %s", todo.Title)
 		}
 
-		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{ReminderDateMessageID: reminderMsgID, DueDateMessageID: dueMsgID}, entityID)
+		// ✅ Create the to-do entry in the database
+		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{
+			ReminderDateMessageID: reminderMsgID,
+			DueDateMessageID:      dueMsgID,
+		}, entityID)
 		if err != nil {
-			log.Printf("Error on creating todo entry: %s", err)
+			log.Printf("Error creating to-do entry: %s", err)
 		}
+
 		return nil
 	})
+
 	return createTodoEntry, err
 }
 
