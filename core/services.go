@@ -111,12 +111,10 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			DueDateMessageID:      dueMsgID,
 		}, entityID)
 		if err != nil {
-			log.Printf("Error creating to-do entry: %s", err)
+			log.Printf("Error creating todo entry: %s", err)
 		}
-
 		return nil
 	})
-
 	return createTodoEntry, err
 }
 
