@@ -105,7 +105,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 			log.Printf("Reminders are DISABLED for this to-do entry: %s", todo.Title)
 		}
 
-		// ✅ Create the to-do entry in the database
+		// Create the to-do entry in the database
 		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{
 			ReminderDateMessageID: reminderMsgID,
 			DueDateMessageID:      dueMsgID,
