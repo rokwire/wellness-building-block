@@ -57,7 +57,6 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
 	var createTodoEntry *model.TodoEntry
 	entityID := uuid.NewString()
-
 	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		topic := "create todo entry"
 		var dueMsgID *string
@@ -103,7 +102,7 @@ func (app *Application) createTodoEntry(appID string, orgID string, userID strin
 				}
 			}
 		} else {
-			log.Printf("ℹ️ Reminders are DISABLED for this to-do entry: %s", todo.Title)
+			log.Printf("Reminders are DISABLED for this to-do entry: %s", todo.Title)
 		}
 
 		// ✅ Create the to-do entry in the database
