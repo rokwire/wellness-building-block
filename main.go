@@ -42,10 +42,10 @@ import (
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
 
-	"github.com/golang-jwt/jwt"
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
-	"github.com/rokwire/core-auth-library-go/v2/sigauth"
-	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/keys"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/sigauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 )
 
 var (
@@ -89,41 +89,43 @@ func main() {
 	mtOrgID := getEnvKey("WELLNESS_MULTI_TENANCY_ORG_ID", true)
 	//serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 
-	authService := authservice.AuthService{
+	authService := auth.Service{
 		ServiceID:   serviceID,
 		ServiceHost: serviceURL,
 		FirstParty:  true,
 		AuthBaseURL: coreBBHost,
 	}
 
-	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, []string{"rewards"})
+	serviceRegLoader, err := auth.NewRemoteServiceRegLoader(&authService, []string{"rewards"})
 	if err != nil {
 		log.Fatalf("Error initializing remote service registration loader: %v", err)
 	}
 
-	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader)
+	serviceRegManager, err := auth.NewServiceRegManager(&authService, serviceRegLoader, true)
 	if err != nil {
 		log.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
 	serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 	privKeyRaw := getEnvKey("WELLNESS_PRIV_KEY", true)
+
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
-	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
+	privKeyObj, err := keys.NewPrivKey(keys.RS256, privKeyRaw)
 	if err != nil {
 		log.Fatalf("Error parsing priv key: %v", err)
 	}
-	signatureAuth, err := sigauth.NewSignatureAuth(privKey, serviceRegManager, false)
+
+	signatureAuth, err := sigauth.NewSignatureAuth(privKeyObj, serviceRegManager, false, true)
 	if err != nil {
 		log.Fatalf("Error initializing signature auth: %v", err)
 	}
 
-	serviceAccountLoader, err := authservice.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
+	serviceAccountLoader, err := auth.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
 	if err != nil {
 		log.Fatalf("Error initializing remote service account loader: %v", err)
 	}
 
-	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
+	serviceAccountManager, err := auth.NewServiceAccountManager(&authService, serviceAccountLoader)
 	if err != nil {
 		log.Fatalf("Error initializing service account manager: %v", err)
 	}
