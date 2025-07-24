@@ -6,7 +6,6 @@ toolchain go1.24.4
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/rokwire/rokwire-building-block-sdk-go v1.8.3
