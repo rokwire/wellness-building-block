@@ -42,7 +42,8 @@ import (
 	storage "wellness/driven/storage"
 	driver "wellness/driver/web"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/keys"
 	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/sigauth"
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 )
@@ -100,19 +101,21 @@ func main() {
 		log.Fatalf("Error initializing remote service registration loader: %v", err)
 	}
 
-	serviceRegManager, err := auth.NewServiceRegManager(&authService, serviceRegLoader)
+	serviceRegManager, err := auth.NewServiceRegManager(&authService, serviceRegLoader, true)
 	if err != nil {
 		log.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
 	serviceAccountID := getEnvKey("WELLNESS_SERVICE_ACCOUNT_ID", false)
 	privKeyRaw := getEnvKey("WELLNESS_PRIV_KEY", true)
+
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
-	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
+	privKeyObj, err := keys.NewPrivKey(keys.RS256, privKeyRaw)
 	if err != nil {
 		log.Fatalf("Error parsing priv key: %v", err)
 	}
-	signatureAuth, err := sigauth.NewSignatureAuth(privKey, serviceRegManager, false)
+
+	signatureAuth, err := sigauth.NewSignatureAuth(privKeyObj, serviceRegManager, false, true)
 	if err != nil {
 		log.Fatalf("Error initializing signature auth: %v", err)
 	}
