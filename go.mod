@@ -7,13 +7,10 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
-	github.com/rokwire/core-auth-library-go v1.0.9
-	github.com/rokwire/core-auth-library-go/v2 v2.2.0
-	github.com/rokwire/logging-library-go v1.0.3
-	github.com/rokwire/logging-library-go/v2 v2.0.0
 	github.com/swaggo/http-swagger v1.3.3
 	github.com/swaggo/swag v1.8.10
 	go.mongodb.org/mongo-driver v1.11.2
+	github.com/rokwire/rokwire-building-block-sdk-go v1.8.3
 )
 
 require (

@@ -22,13 +22,13 @@ type MessageRef struct {
 type Adapter struct {
 	internalAPIKey    string
 	baseURL           string
-	accountManager    *authservice.ServiceAccountManager
+	accountManager    *auth.ServiceAccountManager
 	multiTenancyAppID string
 	multiTenancyOrgID string
 }
 
 // NewNotificationsAdapter creates a new Notifications BB adapter instance
-func NewNotificationsAdapter(internalAPIKey string, notificationsHost string, accountManager *authservice.ServiceAccountManager, mtAppID string, mtOrgID string) *Adapter {
+func NewNotificationsAdapter(internalAPIKey string, notificationsHost string, accountManager *auth.ServiceAccountManager, mtAppID string, mtOrgID string) *Adapter {
 	return &Adapter{internalAPIKey: internalAPIKey, baseURL: notificationsHost, accountManager: accountManager, multiTenancyAppID: mtAppID,
 		multiTenancyOrgID: mtOrgID}
 }

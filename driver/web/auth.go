@@ -41,7 +41,7 @@ type Auth struct {
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *Auth {
+func NewAuth(app *core.Application, config model.Config, serviceRegManager *auth.ServiceRegManager) *Auth {
 	coreAuth := NewCoreAuth(app, config, serviceRegManager)
 	internalAuth := newInternalAuth(config.InternalAPIKey)
 
@@ -60,7 +60,7 @@ type CoreAuth struct {
 }
 
 // NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *CoreAuth {
+func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *auth.ServiceRegManager) *CoreAuth {
 
 	adminPermissionAuth := authorization.NewCasbinAuthorization("driver/web/authorization_model.conf",
 		"driver/web/authorization_policy.csv")

@@ -171,7 +171,7 @@ func (we Adapter) internalAuthWrapFunc(handler internalAuthFunc) http.HandlerFun
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) Adapter {
+func NewWebAdapter(host string, port string, app *core.Application, config model.Config, serviceRegManager *auth.ServiceRegManager) Adapter {
 	auth := NewAuth(app, config, serviceRegManager)
 
 	apisHandler := rest.NewApisHandler(app)
