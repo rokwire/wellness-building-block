@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"wellness/core/model"
+
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
 )
 
 // Adapter is the adapter for Core BB APIs

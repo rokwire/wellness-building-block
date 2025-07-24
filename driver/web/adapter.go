@@ -24,6 +24,7 @@ import (
 	"wellness/utils"
 
 	"github.com/gorilla/mux"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
 	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/tokenauth"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
