@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"wellness/core/model"
 
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
 )
 
 // MessageRef implemetnts appID, orgID and ID
@@ -22,13 +22,13 @@ type MessageRef struct {
 type Adapter struct {
 	internalAPIKey    string
 	baseURL           string
-	accountManager    *authservice.ServiceAccountManager
+	accountManager    *auth.ServiceAccountManager
 	multiTenancyAppID string
 	multiTenancyOrgID string
 }
 
 // NewNotificationsAdapter creates a new Notifications BB adapter instance
-func NewNotificationsAdapter(internalAPIKey string, notificationsHost string, accountManager *authservice.ServiceAccountManager, mtAppID string, mtOrgID string) *Adapter {
+func NewNotificationsAdapter(internalAPIKey string, notificationsHost string, accountManager *auth.ServiceAccountManager, mtAppID string, mtOrgID string) *Adapter {
 	return &Adapter{internalAPIKey: internalAPIKey, baseURL: notificationsHost, accountManager: accountManager, multiTenancyAppID: mtAppID,
 		multiTenancyOrgID: mtOrgID}
 }
