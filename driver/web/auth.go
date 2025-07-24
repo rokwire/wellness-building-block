@@ -20,12 +20,11 @@ import (
 	"net/http"
 	"wellness/core"
 	"wellness/core/model"
-
-	"github.com/rokwire/core-auth-library-go/authorization"
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
-	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
-	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logutils"
+	//"github.com/rokwire/core-auth-library-go/authorization"
+	//"github.com/rokwire/core-auth-library-go/v2/authservice"
+	//"github.com/rokwire/core-auth-library-go/v2/tokenauth"
+	//"github.com/rokwire/logging-library-go/errors"
+	//"github.com/rokwire/logging-library-go/logutils"
 )
 
 // Authorization is an interface for auth types

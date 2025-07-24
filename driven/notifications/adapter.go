@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"wellness/core/model"
-
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
 )
 
 // MessageRef implemetnts appID, orgID and ID

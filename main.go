@@ -43,8 +43,7 @@ import (
 	driver "wellness/driver/web"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
-	"github.com/rokwire/core-auth-library-go/v2/sigauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/sigauth"
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 )
 
