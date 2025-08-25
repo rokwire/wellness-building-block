@@ -16,6 +16,7 @@ package core
 
 import (
 	"log"
+	"strings"
 	"wellness/core/model"
 	"wellness/driven/storage"
 
@@ -54,68 +55,89 @@ func (app *Application) getTodoEntry(appID string, orgID string, userID string, 
 	return app.storage.GetTodoEntry(nil, appID, orgID, userID, id)
 }
 
-func (app *Application) createTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
-	var createTodoEntry *model.TodoEntry
+func (app *Application) createTodoEntry(appID, orgID, userID string, todo *model.TodoEntry) (*model.TodoEntry, error) {
+	var created *model.TodoEntry
 	entityID := uuid.NewString()
-	err := app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+
+	err := app.storage.PerformTransaction(func(ctx storage.TransactionContext) error {
 		topic := "create todo entry"
 		var dueMsgID *string
 		var reminderMsgID *string
-		var err error
 
-		// Check if reminders are enabled before sending notifications
-		if todo.ReminderType != "none" {
+		// Normalize the reminder type
+		rt := strings.ToLower(strings.TrimSpace(todo.ReminderType))
+		remindersEnabled := rt != "" && rt != "none"
+
+		if remindersEnabled {
 			log.Printf("Reminders are ENABLED for this to-do entry: %s", todo.Title)
 
-			if todo.DueDateTime != nil {
-				dueDateTime := todo.DueDateTime.Unix()
-				dueMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueDateTime, map[string]string{
-					"type":        "wellness_todo_entry",
-					"operation":   "todo_reminder",
-					"entity_type": "wellness_todo_entry",
-					"entity_id":   entityID,
-					"entity_name": todo.Title,
-				})
+			// If your product only wants a due-time notification when it's the chosen mode,
+			// gate it explicitly (adjust values to your actual enum):
+			includesDue := rt == "at_due_time" || rt == "both"
 
+			if includesDue && todo.DueDateTime != nil {
+				dueUnix := todo.DueDateTime.Unix()
+				id, err := app.notifications.SendNotification(
+					[]model.NotificationRecipient{{UserID: userID}},
+					&topic, "To-Do List Reminder", todo.Title, appID, orgID, &dueUnix,
+					map[string]string{
+						"type":        "wellness_todo_entry",
+						"operation":   "todo_reminder",
+						"entity_type": "wellness_todo_entry",
+						"entity_id":   entityID,
+						"entity_name": todo.Title,
+					},
+				)
 				if err != nil {
-					log.Printf("Error sending DueDateTime notification for %s: %s", todo.ID, err)
+					log.Printf("Error sending DueDateTime notification for %s: %v", todo.ID, err)
 				} else {
+					dueMsgID = id
 					log.Printf("Successfully sent DueDateTime notification for %s", entityID)
 				}
 			}
 
 			if todo.ReminderDateTime != nil {
-				reminderDateTime := todo.ReminderDateTime.Unix()
-				reminderMsgID, err = app.notifications.SendNotification([]model.NotificationRecipient{{UserID: userID}}, &topic, "To-Do List Reminder", todo.Title, appID, orgID, &reminderDateTime, map[string]string{
-					"type":        "wellness_todo_entry",
-					"operation":   "todo_reminder",
-					"entity_type": "wellness_todo_entry",
-					"entity_id":   entityID,
-					"entity_name": todo.Title,
-				})
-
+				remUnix := todo.ReminderDateTime.Unix()
+				id, err := app.notifications.SendNotification(
+					[]model.NotificationRecipient{{UserID: userID}},
+					&topic, "To-Do List Reminder", todo.Title, appID, orgID, &remUnix,
+					map[string]string{
+						"type":        "wellness_todo_entry",
+						"operation":   "todo_reminder",
+						"entity_type": "wellness_todo_entry",
+						"entity_id":   entityID,
+						"entity_name": todo.Title,
+					},
+				)
 				if err != nil {
-					log.Printf("Error sending ReminderDateTime notification for %s: %s", todo.ID, err)
-					//return err // Don't propagate the error. Just create the reminder.
+					log.Printf("Error sending ReminderDateTime notification for %s: %v", todo.ID, err)
 				} else {
+					reminderMsgID = id
 					log.Printf("Successfully sent ReminderDateTime notification for %s", entityID)
 				}
 			}
 		} else {
 			log.Printf("Reminders are DISABLED for this to-do entry: %s", todo.Title)
+			// Hard block: ensure we never schedule notifications accidentally
+			// by ignoring DueDateTime/ReminderDateTime entirely when reminders are off.
 		}
 
-		// Create the to-do entry in the database
-		createTodoEntry, err = app.storage.CreateTodoEntry(appID, orgID, userID, todo, model.MessageIDs{
-			ReminderDateMessageID: reminderMsgID,
-			DueDateMessageID:      dueMsgID,
-		}, entityID)
+		var err error
+		created, err = app.storage.CreateTodoEntry(
+			appID, orgID, userID, todo,
+			model.MessageIDs{
+				ReminderDateMessageID: reminderMsgID,
+				DueDateMessageID:      dueMsgID,
+			},
+			entityID,
+		)
 		if err != nil {
-			log.Printf("Error creating todo entry: %s", err)
+			log.Printf("Error creating todo entry: %v", err)
 		}
 		return nil
 	})
-	return createTodoEntry, err
+
+	return created, err
 }
 
 func (app *Application) updateTodoEntry(appID string, orgID string, userID string, todo *model.TodoEntry, id string) (*model.TodoEntry, error) {
