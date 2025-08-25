@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- To-do list reminder sent when reminders are turned off - fix [#52](https://github.com/rokwire/wellness-building-block/issues/52)
+
 ## [1.9.0] - 2025-07-24
 ### Changed
 - Integrate Rokwire Building Block SDK [#59](https://github.com/rokwire/wellness-building-block/issues/59)
