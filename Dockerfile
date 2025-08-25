@@ -1,4 +1,4 @@
-FROM golang:1.18-buster as builder
+FROM golang:1.24-alpine AS builder
 
 ENV CGO_ENABLED=0
 
@@ -16,7 +16,7 @@ RUN apk add --no-cache tzdata ca-certificates
 COPY --from=builder /wellness-app/bin/wellness /
 COPY --from=builder /wellness-app/docs/swagger.yaml /docs/swagger.yaml
 
-COPY --from=builder /wellness-app/driver/web/authorization_model.conf /driver/web/authorization_model.conf
-COPY --from=builder /wellness-app/driver/web/authorization_policy.csv /driver/web/authorization_policy.csv
+COPY --from=builder /wellness-app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_scope.conf /wellness-app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_scope.conf
+COPY --from=builder /wellness-app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_string.conf /wellness-app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_string.conf
 
 ENTRYPOINT ["/wellness"]

@@ -6,3 +6,4 @@ build/
 .git
 docker-compose.env
 docker-compose.yml
+.env

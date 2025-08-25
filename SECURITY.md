@@ -6,8 +6,8 @@ Patches for **Wellness Building Block** in this repository will only be applied 
 
 | Version  | Supported          |
 |----------| ------------------ |
-| 1.7.1    | :white_check_mark: |
-| < 1.7.1 | :x: |
+| 1.9.0    | :white_check_mark: |
+| < 1.9.0 | :x: |
 
 ## Reporting a Bug or Vulnerability
 

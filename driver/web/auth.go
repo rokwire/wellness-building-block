@@ -21,11 +21,11 @@ import (
 	"wellness/core"
 	"wellness/core/model"
 
-	"github.com/rokwire/core-auth-library-go/authorization"
-	"github.com/rokwire/core-auth-library-go/v2/authservice"
-	"github.com/rokwire/core-auth-library-go/v2/tokenauth"
-	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/tokenauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/errors"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
 )
 
 // Authorization is an interface for auth types
@@ -41,7 +41,7 @@ type Auth struct {
 }
 
 // NewAuth creates new auth handler
-func NewAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *Auth {
+func NewAuth(app *core.Application, config model.Config, serviceRegManager *auth.ServiceRegManager) *Auth {
 	coreAuth := NewCoreAuth(app, config, serviceRegManager)
 	internalAuth := newInternalAuth(config.InternalAPIKey)
 
@@ -60,7 +60,7 @@ type CoreAuth struct {
 }
 
 // NewCoreAuth creates new CoreAuth
-func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *authservice.ServiceRegManager) *CoreAuth {
+func NewCoreAuth(app *core.Application, config model.Config, serviceRegManager *auth.ServiceRegManager) *CoreAuth {
 
 	adminPermissionAuth := authorization.NewCasbinAuthorization("driver/web/authorization_model.conf",
 		"driver/web/authorization_policy.csv")
@@ -86,7 +86,7 @@ type PermissionsAuth struct {
 func (a *PermissionsAuth) start() {}
 
 func (a *PermissionsAuth) check(req *http.Request) (int, *tokenauth.Claims, error) {
-	claims, err := a.tokenAuth.CheckRequestTokens(req)
+	claims, err := a.tokenAuth.CheckRequestToken(req)
 	if err != nil {
 		return http.StatusUnauthorized, nil, errors.WrapErrorAction("typeCheckServicesAuthRequestToken", logutils.TypeToken, nil, err)
 	}
@@ -115,7 +115,7 @@ type UserAuth struct {
 func (a *UserAuth) start() {}
 
 func (a *UserAuth) check(req *http.Request) (int, *tokenauth.Claims, error) {
-	claims, err := a.tokenAuth.CheckRequestTokens(req)
+	claims, err := a.tokenAuth.CheckRequestToken(req)
 	if err != nil {
 		return http.StatusUnauthorized, nil, errors.WrapErrorAction("typeCheckServicesAuthRequestToken", logutils.TypeToken, nil, err)
 	}
@@ -143,7 +143,7 @@ type StandardAuth struct {
 func (a *StandardAuth) start() {}
 
 func (a *StandardAuth) check(req *http.Request) (int, *tokenauth.Claims, error) {
-	claims, err := a.tokenAuth.CheckRequestTokens(req)
+	claims, err := a.tokenAuth.CheckRequestToken(req)
 	if err != nil {
 		return http.StatusUnauthorized, nil, errors.WrapErrorAction("typeCheckServicesAuthRequestToken", logutils.TypeToken, nil, err)
 	}
